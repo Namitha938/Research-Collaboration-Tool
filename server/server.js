@@ -33,7 +33,7 @@ app.get("/api/health", (req, res) => res.json({ success: true, message: "Researc
 
 // Mount routes
 app.use("/api/auth", require("./routes/authRoutes"));
-// app.use("/api/projects", require("./routes/projectRoutes"));
+app.use("/api/projects", require("./routes/projectRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);

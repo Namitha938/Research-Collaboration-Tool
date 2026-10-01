@@ -200,7 +200,7 @@ const Landing = () => {
             Bring your research team, resources, and ideas together in one powerful workspace.
           </p>
           <Link to="/register">
-            <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-100 shadow-xl shadow-white/10 hover:shadow-white/20">
+            <Button size="lg" variant="light">
               Start Your Research <ArrowRight size={18} className="ml-2" />
             </Button>
           </Link>
