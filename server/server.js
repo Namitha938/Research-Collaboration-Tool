@@ -1,4 +1,6 @@
 require("dotenv").config();
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
@@ -27,10 +29,10 @@ app.use(morgan("dev"));
 app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 
 // Health check
-app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+app.get("/api/health", (req, res) => res.json({ success: true, message: "Research Collaboration Tool API is running" }));
 
-// TODO: mount routes as each module is built, e.g.
-// app.use("/api/auth", require("./routes/authRoutes"));
+// Mount routes
+app.use("/api/auth", require("./routes/authRoutes"));
 // app.use("/api/projects", require("./routes/projectRoutes"));
 
 app.use(notFound);
