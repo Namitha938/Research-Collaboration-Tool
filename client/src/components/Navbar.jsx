@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Atom } from 'lucide-react';
+import { Menu, X, Atom, ArrowRight } from 'lucide-react';
 import Button from './Button';
 
 const Navbar = () => {
@@ -52,6 +52,9 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
+            <Link to="/admin/login" className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-primary-600 transition-colors mr-2">
+              Admin Portal <ArrowRight size={14} />
+            </Link>
             <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
               Sign In
             </Link>
@@ -79,6 +82,9 @@ const Navbar = () => {
           <a href="#features" className="text-base font-medium text-slate-700 py-2 border-b border-slate-100">Features</a>
           <a href="#how-it-works" className="text-base font-medium text-slate-700 py-2 border-b border-slate-100">How It Works</a>
           <div className="flex flex-col gap-3 mt-2">
+            <Link to="/admin/login" className="flex items-center justify-center gap-1 text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors py-1">
+              Admin Portal <ArrowRight size={14} />
+            </Link>
             <Link to="/login">
               <Button variant="secondary" className="w-full">Sign In</Button>
             </Link>

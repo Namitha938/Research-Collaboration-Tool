@@ -67,7 +67,7 @@ const Footer = () => {
           <p className="text-sm text-slate-500">
             © {new Date().getFullYear()} ResearchHub. All rights reserved.
           </p>
-          <div className="flex gap-6">
+          <div className="flex items-center gap-6">
             <a href="#" className="text-sm text-slate-500 hover:text-primary-600 transition-colors">Privacy</a>
             <a href="#" className="text-sm text-slate-500 hover:text-primary-600 transition-colors">Terms</a>
           </div>
