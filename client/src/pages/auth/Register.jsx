@@ -75,7 +75,7 @@ const Register = () => {
             />
           </div>
 
-          <div className="hidden">
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
             <select 
               name="role"
