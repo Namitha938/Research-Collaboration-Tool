@@ -4,6 +4,7 @@ import { getProjectById } from '../../api/projectService';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, Database, BookOpen, MessageSquare } from 'lucide-react';
 import TeamTab from '../../components/team/TeamTab';
+import Tasks from '../Tasks';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -139,6 +140,8 @@ const ProjectDetail = () => {
 
       {activeTab === 'Team' ? (
         <TeamTab project={project} />
+      ) : activeTab === 'Tasks' ? (
+        <Tasks projectId={project._id} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
