@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 import NewTaskModal from "../components/NewTaskModal";
 
 const PRIORITY_STYLES = {
@@ -20,22 +21,44 @@ const PRIORITY_STYLES = {
 
 const COLUMNS = [
   { id: "todo", title: "To Do", tone: "bg-slate-100 text-slate-700 border-slate-300" },
-  { id: "in-progress", title: "In Progress", tone: "bg-amber-100 text-amber-800 border-amber-300" },
+  { id: "in_progress", title: "In Progress", tone: "bg-amber-100 text-amber-800 border-amber-300" },
   { id: "completed", title: "Completed", tone: "bg-emerald-100 text-emerald-800 border-emerald-300" },
 ];
 
-export default function Tasks() {
+export default function Tasks({ projectId }) {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [selectedProject, setSelectedProject] = useState("");
+  const [selectedProject, setSelectedProject] = useState(projectId || "");
   const [viewMode, setViewMode] = useState("kanban");
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
+  const currentProject = projects.find((p) => p._id === selectedProject);
+  let userRole = null;
+  if (currentProject) {
+    const ownerId = currentProject.owner?._id || currentProject.owner;
+    if (ownerId === (user?.id || user?._id)) {
+      userRole = "owner";
+    } else {
+      const member = currentProject.members?.find((m) => {
+        const uid = m.user?._id || m.user;
+        return uid === (user?.id || user?._id);
+      });
+      userRole = member?.role || null;
+    }
+  }
+  const isOwner = userRole === "owner";
+
   const fetchTasks = async (projId) => {
+    if (!projId) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const url = projId ? `/tasks?project=${projId}` : "/tasks";
+      const url = `/projects/${projId}/tasks`;
       const res = await api.get(url);
       setTasks(res.data.tasks || []);
     } catch (err) {
@@ -44,6 +67,12 @@ export default function Tasks() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (projectId) {
+      setSelectedProject(projectId);
+    }
+  }, [projectId]);
 
   useEffect(() => {
     api
@@ -58,13 +87,26 @@ export default function Tasks() {
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
-      await api.put(`/tasks/${taskId}`, { status: newStatus });
+      await api.patch(`/tasks/${taskId}/status`, { status: newStatus });
       setTasks((prev) =>
         prev.map((t) => (t._id === taskId ? { ...t, status: newStatus } : t))
       );
       toast.success("Task status updated");
     } catch (err) {
       toast.error("Failed to update status");
+    }
+  };
+
+  const handleAssignTask = async (taskId, newAssigneeId) => {
+    try {
+      const payload = { assignedTo: newAssigneeId || null };
+      const res = await api.patch(`/tasks/${taskId}/assign`, payload);
+      setTasks((prev) =>
+        prev.map((t) => (t._id === taskId ? res.data.task : t))
+      );
+      toast.success("Task assignee updated");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update assignee");
     }
   };
 
@@ -84,30 +126,35 @@ export default function Tasks() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] animate-fade-in space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Task Management</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Track, assign, and manage collaborative research deliverables.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative">
-            <select
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none focus:border-primary-500"
-            >
-              <option value="">All Projects</option>
-              {projects.map((p) => (
-                <option key={p._id} value={p._id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
+    <>
+      <div className="mx-auto max-w-[1400px] animate-fade-in space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+        {!projectId && (
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Task Management</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Track, assign, and manage collaborative research deliverables.
+            </p>
           </div>
+        )}
+
+        <div className={`flex flex-wrap items-center gap-3 ${projectId ? "w-full justify-between" : ""}`}>
+          {!projectId && (
+            <div className="relative">
+              <select
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none focus:border-primary-500"
+              >
+                <option value="">All Projects</option>
+                {projects.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {p.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
             <button
@@ -132,12 +179,14 @@ export default function Tasks() {
             </button>
           </div>
 
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
-          >
-            <Plus size={16} /> New Task
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+            >
+              <Plus size={16} /> New Task
+            </button>
+          )}
         </div>
       </div>
 
@@ -148,18 +197,22 @@ export default function Tasks() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-600">
             <FolderKanban size={28} />
           </div>
-          <h3 className="mt-4 text-base font-semibold text-slate-900">No tasks found</h3>
+          <h3 className="mt-4 text-base font-semibold text-slate-900">
+            {selectedProject ? "No tasks found" : "Select a project"}
+          </h3>
           <p className="mt-1 max-w-sm text-sm text-slate-500">
             {selectedProject
               ? "There are no tasks associated with this project yet."
-              : "Create tasks to coordinate research milestones with your team."}
+              : "Select a project to view its tasks."}
           </p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="mt-6 flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
-          >
-            <Plus size={16} /> Add First Task
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="mt-6 flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+            >
+              <Plus size={16} /> {selectedProject ? "Add First Task" : "New Task"}
+            </button>
+          )}
         </div>
       ) : viewMode === "kanban" ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -197,13 +250,15 @@ export default function Tasks() {
                           >
                             {t.priority}
                           </span>
-                          <button
-                            onClick={() => handleDeleteTask(t._id)}
-                            title="Delete task"
-                            className="text-slate-400 hover:text-red-500"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          {isOwner && (
+                            <button
+                              onClick={() => handleDeleteTask(t._id)}
+                              title="Delete task"
+                              className="text-slate-400 hover:text-red-500"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
                         </div>
 
                         <h4 className="mt-2.5 font-medium text-slate-900">{t.title}</h4>
@@ -221,7 +276,29 @@ export default function Tasks() {
                         <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
                           <div className="flex items-center gap-1">
                             <User size={13} />
-                            <span>{t.assignedTo?.name || "Unassigned"}</span>
+                            {isOwner ? (
+                              <select
+                                value={t.assignedTo?._id || ""}
+                                onChange={(e) => handleAssignTask(t._id, e.target.value)}
+                                className="max-w-[100px] truncate rounded border border-slate-200 bg-white px-1 py-0.5 text-xs text-slate-700 outline-none"
+                              >
+                                <option value="">Unassigned</option>
+                                {(() => {
+                                  const tProj = projects.find((p) => p._id === (t.project?._id || t.project));
+                                  return (tProj?.members || []).map((m) => {
+                                    const uid = m.user?._id || m.user;
+                                    const name = m.user?.name || m.user?.email || "Unknown";
+                                    return (
+                                      <option key={uid} value={uid}>
+                                        {name}
+                                      </option>
+                                    );
+                                  });
+                                })()}
+                              </select>
+                            ) : (
+                              <span>{t.assignedTo?.name || "Unassigned"}</span>
+                            )}
                           </div>
                           {dueStr && (
                             <div className="flex items-center gap-1 text-slate-500">
@@ -231,32 +308,34 @@ export default function Tasks() {
                           )}
                         </div>
 
-                        <div className="mt-3 flex gap-1.5 pt-2">
-                          {col.id !== "todo" && (
-                            <button
-                              onClick={() => handleStatusChange(t._id, "todo")}
-                              className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
-                            >
-                              ← To Do
-                            </button>
-                          )}
-                          {col.id !== "in-progress" && (
-                            <button
-                              onClick={() => handleStatusChange(t._id, "in-progress")}
-                              className="rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-100"
-                            >
-                              In Progress
-                            </button>
-                          )}
-                          {col.id !== "completed" && (
-                            <button
-                              onClick={() => handleStatusChange(t._id, "completed")}
-                              className="rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-100"
-                            >
-                              ✓ Done
-                            </button>
-                          )}
-                        </div>
+                        {(() => {
+                          const userId = user?.id || user?._id;
+                          const isAssignedToMe = t.assignedTo?._id === userId || t.assignedTo === userId;
+                          const canChangeStatus = isAssignedToMe;
+                          
+                          if (!canChangeStatus) return null;
+                          
+                          return (
+                            <div className="mt-3 flex gap-1.5 pt-2">
+                              {t.status === "todo" && (
+                                <button
+                                  onClick={() => handleStatusChange(t._id, "in_progress")}
+                                  className="rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-100"
+                                >
+                                  ▶ Start Task
+                                </button>
+                              )}
+                              {t.status === "in_progress" && (
+                                <button
+                                  onClick={() => handleStatusChange(t._id, "completed")}
+                                  className="rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-100"
+                                >
+                                  ✓ Mark Completed
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}
@@ -276,7 +355,7 @@ export default function Tasks() {
                 <th className="px-6 py-3.5">Priority</th>
                 <th className="px-6 py-3.5">Assigned To</th>
                 <th className="px-6 py-3.5">Due Date</th>
-                <th className="px-6 py-3.5 text-right">Actions</th>
+                {isOwner && <th className="px-6 py-3.5 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -294,15 +373,43 @@ export default function Tasks() {
                     {t.project?.title || "—"}
                   </td>
                   <td className="px-6 py-4">
-                    <select
-                      value={t.status}
-                      onChange={(e) => handleStatusChange(t._id, e.target.value)}
-                      className="rounded border border-slate-200 bg-white px-2 py-1 text-xs font-medium capitalize text-slate-700 outline-none"
-                    >
-                      <option value="todo">To Do</option>
-                      <option value="in-progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                    </select>
+                    {(() => {
+                      const userId = user?.id || user?._id;
+                      const isAssignedToMe = t.assignedTo?._id === userId || t.assignedTo === userId;
+                      const canChangeStatus = isAssignedToMe;
+                      
+                      if (!canChangeStatus) {
+                        return (
+                          <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium capitalize text-slate-700">
+                            {t.status.replace("_", " ")}
+                          </span>
+                        );
+                      }
+                      
+                      return (
+                        <div className="flex items-center gap-2">
+                          <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium capitalize text-slate-700">
+                            {t.status.replace("_", " ")}
+                          </span>
+                          {t.status === "todo" && (
+                            <button
+                              onClick={() => handleStatusChange(t._id, "in_progress")}
+                              className="rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-100"
+                            >
+                              ▶ Start
+                            </button>
+                          )}
+                          {t.status === "in_progress" && (
+                            <button
+                              onClick={() => handleStatusChange(t._id, "completed")}
+                              className="rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-100"
+                            >
+                              ✓ Finish
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4">
                     <span
@@ -314,26 +421,51 @@ export default function Tasks() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-xs text-slate-600">
-                    {t.assignedTo?.name || "Unassigned"}
+                    {isOwner ? (
+                      <select
+                        value={t.assignedTo?._id || ""}
+                        onChange={(e) => handleAssignTask(t._id, e.target.value)}
+                        className="w-full max-w-[150px] rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 outline-none"
+                      >
+                        <option value="">Unassigned</option>
+                        {(() => {
+                          const tProj = projects.find((p) => p._id === (t.project?._id || t.project));
+                          return (tProj?.members || []).map((m) => {
+                            const uid = m.user?._id || m.user;
+                            const name = m.user?.name || m.user?.email || "Unknown";
+                            return (
+                              <option key={uid} value={uid}>
+                                {name}
+                              </option>
+                            );
+                          });
+                        })()}
+                      </select>
+                    ) : (
+                      <span>{t.assignedTo?.name || "Unassigned"}</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-xs text-slate-500">
                     {t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "—"}
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleDeleteTask(t._id)}
-                      className="text-slate-400 hover:text-red-600"
-                      title="Delete Task"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
+                  {isOwner && (
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleDeleteTask(t._id)}
+                        className="text-slate-400 hover:text-red-600"
+                        title="Delete Task"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+      </div>
 
       {showModal && (
         <NewTaskModal
@@ -342,7 +474,7 @@ export default function Tasks() {
           onCreated={handleCreated}
         />
       )}
-    </div>
+    </>
   );
 }
 

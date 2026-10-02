@@ -6,7 +6,11 @@ const projectSchema = new mongoose.Schema(
     description: { type: String, required: true },
     researchArea: { type: String, required: true },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    members: [{
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      role: { type: String, enum: ["owner", "researcher", "viewer"], default: "researcher" },
+      joinedAt: { type: Date, default: Date.now }
+    }],
     status: {
       type: String,
       enum: ["active", "completed", "archived"],

@@ -3,6 +3,9 @@ import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 
+const field =
+  "w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20";
+
 export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated }) {
   const [projects, setProjects] = useState([]);
   const [projectId, setProjectId] = useState(defaultProjectId);
@@ -65,18 +68,18 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
         project: projectId,
         priority,
         status,
+        assignedTo: assignedTo ? assignedTo : null,
       };
 
-      if (assignedTo) payload.assignedTo = assignedTo;
       if (dueDate) payload.dueDate = dueDate;
 
-      const res = await api.post("/tasks", payload);
+      const res = await api.post(`/projects/${projectId}/tasks`, payload);
       toast.success("Task created successfully!");
       if (onCreated) onCreated(res.data.task);
       onClose();
     } catch (err) {
       console.error("Error creating task:", err);
-      toast.error(err.response?.data?.message || "Failed to create task");
+      toast.error(err.response?.data?.message || "Unable to create task. Please check the task details.");
     } finally {
       setLoading(false);
     }
@@ -85,28 +88,30 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
   const projectMembers = selectedProjectData?.members || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Create New Task</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+      <div className="w-full max-w-lg space-y-4 rounded-2xl bg-white p-6 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900">Create New Task</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            aria-label="Close"
+            className="text-slate-400 hover:text-slate-600 transition"
           >
-            <X className="w-5 h-5" />
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="mb-1 block text-xs font-medium text-slate-500">
               Project <span className="text-rose-500">*</span>
             </label>
             <select
               value={projectId}
               onChange={(e) => setProjectId(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={field}
             >
               <option value="" disabled>Select a project</option>
               {projects.map((proj) => (
@@ -118,7 +123,7 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="mb-1 block text-xs font-medium text-slate-500">
               Task Title <span className="text-rose-500">*</span>
             </label>
             <input
@@ -127,12 +132,12 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Conduct literature review on transformer models"
               required
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={field}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="mb-1 block text-xs font-medium text-slate-500">
               Description
             </label>
             <textarea
@@ -140,51 +145,55 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide context, acceptance criteria, or research notes..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={field}
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
                 Assignee
               </label>
               <select
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={field}
               >
                 <option value="">Unassigned</option>
-                {projectMembers.map((member) => (
-                  <option key={member._id} value={member._id}>
-                    {member.name || member.email}
-                  </option>
-                ))}
+                {projectMembers.map((member) => {
+                  const uid = member.user?._id || member.user || member._id;
+                  const name = member.user?.name || member.user?.email || member.name || member.email || "Unknown";
+                  return (
+                    <option key={member._id || uid} value={uid}>
+                      {name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
                 Due Date
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={field}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
                 Priority
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={field}
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -193,13 +202,13 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
                 Status
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={field}
               >
                 <option value="todo">To Do</option>
                 <option value="in-progress">In Progress</option>
@@ -208,18 +217,18 @@ export default function NewTaskModal({ defaultProjectId = "", onClose, onCreated
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="mt-4 flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium transition hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-xl transition shadow-sm"
+              className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-60"
             >
               {loading ? "Creating..." : "Create Task"}
             </button>
