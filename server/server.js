@@ -52,6 +52,7 @@ app.get("/api/test-email", async (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/invitations", require("./routes/invitationRoutes"));
+app.use("/api", require("./routes/taskRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);

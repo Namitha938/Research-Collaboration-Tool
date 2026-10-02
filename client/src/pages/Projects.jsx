@@ -14,8 +14,9 @@ export default function Projects() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-[1300px] animate-fade-in">
-      <div className="mb-6 flex items-center justify-between">
+    <>
+      <div className="mx-auto max-w-[1300px] animate-fade-in">
+        <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Projects</h1>
         <button onClick={() => setShowModal(true)} className="flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus size={16} /> New Project
@@ -28,7 +29,8 @@ export default function Projects() {
           {projects.map((p) => <ProjectCard key={p._id} project={p} />)}
         </div>
       )}
+      </div>
       {showModal && <NewProjectModal onClose={() => setShowModal(false)} onCreated={(p) => setProjects([p, ...projects])} />}
-    </div>
+    </>
   );
 }
