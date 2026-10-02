@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   Atom, LayoutGrid, FolderKanban, SquareCheckBig, FileText, Database,
   BookOpen, Users, MessageSquare, Bell, Settings, LogOut, Search, Menu,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
@@ -25,6 +26,31 @@ export default function DashboardLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const res = await api.get("/notifications/unread-count");
+        setUnreadCount(res.data.count);
+      } catch (err) {
+        console.error("Failed to fetch unread notifications count");
+      }
+    };
+
+    if (user) {
+      fetchUnread();
+      const interval = setInterval(fetchUnread, 30000); // Poll every 30s
+      
+      const handleForceFetch = () => fetchUnread();
+      window.addEventListener("notificationsRead", handleForceFetch);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener("notificationsRead", handleForceFetch);
+      };
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -115,7 +141,11 @@ export default function DashboardLayout() {
           <div className="flex items-center gap-5">
             <NavLink to="/notifications" className="relative text-slate-500 hover:text-slate-800">
               <Bell size={20} />
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-red-500" />
+              {unreadCount > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </NavLink>
             <div className="flex items-center gap-3 border-l border-slate-200 pl-5">
               <div className="hidden text-right sm:block">

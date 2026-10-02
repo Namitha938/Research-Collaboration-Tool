@@ -1,47 +1,107 @@
-import React, { useState } from "react";
-import { CheckCheck, FolderKanban, SquareCheckBig, FileText, MessageSquare } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { CheckCheck, Mail, UserPlus, FolderKanban, ShieldAlert, CheckCircle, FileText, Bell, Users, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../api/axios";
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "Workspace Created",
-      message: "You have active access to your research projects and workspaces.",
-      time: "Just now",
-      icon: FolderKanban,
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Task Assigned",
-      message: "Check your assigned research milestones in the Tasks dashboard.",
-      time: "1 hour ago",
-      icon: SquareCheckBig,
-      read: false,
-    },
-    {
-      id: 3,
-      title: "Document Repository Active",
-      message: "Research papers and datasets can now be uploaded and managed.",
-      time: "Yesterday",
-      icon: FileText,
-      read: true,
-    },
-    {
-      id: 4,
-      title: "Real-time Collaboration",
-      message: "Socket.IO communication channels are live across all projects.",
-      time: "2 days ago",
-      icon: MessageSquare,
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    toast.success("All notifications marked as read");
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/notifications");
+      setNotifications(res.data.data);
+    } catch (error) {
+      toast.error("Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const markAllRead = async () => {
+    try {
+      await api.patch("/notifications/read-all");
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      window.dispatchEvent(new Event("notificationsRead"));
+      toast.success("All notifications marked as read");
+    } catch (error) {
+      toast.error("Failed to mark notifications as read");
+    }
+  };
+
+  const markAsRead = async (id, read) => {
+    if (read) return;
+    try {
+      await api.patch(`/notifications/${id}/read`);
+      setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, read: true } : n)));
+      window.dispatchEvent(new Event("notificationsRead"));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteNotification = async (id, e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    try {
+      await api.delete(`/notifications/${id}`);
+      setNotifications((prev) => prev.filter((n) => n._id !== id));
+      toast.success("Notification deleted");
+    } catch (error) {
+      toast.error("Failed to delete notification");
+    }
+  };
+
+  const getIconForType = (type) => {
+    switch (type) {
+      case "project_invitation":
+        return <Mail size={18} />;
+      case "invitation_accepted":
+        return <UserPlus size={18} />;
+      case "invitation_rejected":
+        return <ShieldAlert size={18} />;
+      case "member_added":
+        return <Users size={18} />;
+      case "role_changed":
+        return <ShieldAlert size={18} />;
+      case "member_removed":
+        return <Trash2 size={18} />;
+      case "task_assigned":
+      case "task_reassigned":
+        return <FileText size={18} />;
+      case "task_completed":
+        return <CheckCircle size={18} />;
+      default:
+        return <Bell size={18} />;
+    }
+  };
+
+  const getLinkForNotification = (n) => {
+    if (n.type === "project_invitation") {
+      return "/projects"; // Or wherever they accept invites
+    }
+    if (n.project) {
+      return `/projects/${n.project._id || n.project}`;
+    }
+    return "#";
+  };
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-4xl animate-fade-in space-y-6">
+        <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
+        <div className="flex justify-center p-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl animate-fade-in space-y-6">
@@ -53,42 +113,62 @@ export default function Notifications() {
           </p>
         </div>
 
-        <button
-          onClick={markAllRead}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-        >
-          <CheckCheck size={15} /> Mark all as read
-        </button>
+        {notifications.some((n) => !n.read) && (
+          <button
+            onClick={markAllRead}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+          >
+            <CheckCheck size={15} /> Mark all as read
+          </button>
+        )}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100 shadow-sm overflow-hidden">
-        {notifications.map((n) => {
-          const Icon = n.icon;
-          return (
-            <div
-              key={n.id}
-              className={`flex items-start gap-4 p-5 transition-colors ${
+      {notifications.length === 0 ? (
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <Bell size={24} />
+          </div>
+          <h3 className="mt-4 font-semibold text-slate-900">No notifications yet</h3>
+          <p className="mt-1 text-sm text-slate-500">When you receive notifications, they will show up here.</p>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100 shadow-sm overflow-hidden">
+          {notifications.map((n) => (
+            <Link
+              key={n._id}
+              to={getLinkForNotification(n)}
+              onClick={() => markAsRead(n._id, n.read)}
+              className={`flex items-start gap-4 p-5 transition-colors hover:bg-slate-50 ${
                 n.read ? "bg-white" : "bg-primary-50/30"
               }`}
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
-                <Icon size={18} />
+                {getIconForType(n.type)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-slate-900 text-sm">{n.title}</h3>
-                  <span className="text-xs text-slate-400">{n.time}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-400">
+                      {new Date(n.createdAt).toLocaleDateString()} {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    <button
+                      onClick={(e) => deleteNotification(n._id, e)}
+                      className="text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
                 <p className="mt-1 text-sm text-slate-600">{n.message}</p>
               </div>
               {!n.read && (
                 <span className="h-2 w-2 rounded-full bg-primary-600 shrink-0 mt-2" />
               )}
-            </div>
-          );
-        })}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-

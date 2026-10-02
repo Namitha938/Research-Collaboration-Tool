@@ -53,6 +53,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/invitations", require("./routes/invitationRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes"));
+app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api", require("./routes/taskRoutes"));
 
 app.use(notFound);

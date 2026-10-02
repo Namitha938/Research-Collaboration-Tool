@@ -3,6 +3,7 @@ const Project = require("../models/Project");
 const Invitation = require("../models/Invitation");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
+const createNotification = require("../utils/createNotification");
 
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
@@ -90,6 +91,18 @@ const sendInvitation = async (req, res) => {
       return res.status(500).json({ success: false, message: "Failed to send email. Invitation was cancelled." });
     }
 
+    const existingUser = await User.findOne({ email: lowerEmail });
+    if (existingUser) {
+      await createNotification({
+        recipient: existingUser._id,
+        type: "project_invitation",
+        title: "Project invitation",
+        message: `${req.user.name} invited you to join "${project.title}".`,
+        project: projectId,
+        invitation: invitation._id
+      });
+    }
+
     res.status(201).json({ success: true, message: "Invitation sent successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -168,6 +181,15 @@ const removeProjectMember = async (req, res) => {
 
     project.members = project.members.filter((m) => m.user?.toString() !== req.params.userId);
     await project.save();
+
+    await createNotification({
+      recipient: req.params.userId,
+      type: "member_removed",
+      title: "Removed from project",
+      message: `You were removed from "${project.title}".`,
+      project: project._id
+    });
+
     res.json({ success: true, message: "Member removed" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -199,6 +221,15 @@ const changeMemberRole = async (req, res) => {
 
     member.role = role;
     await project.save();
+
+    await createNotification({
+      recipient: req.params.userId,
+      type: "role_changed",
+      title: "Project role updated",
+      message: `Your role in "${project.title}" was changed to ${role}.`,
+      project: project._id
+    });
+
     res.json({ success: true, message: "Role updated" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -252,6 +283,15 @@ const acceptInvitation = async (req, res) => {
     invitation.acceptedAt = new Date();
     await invitation.save();
 
+    await createNotification({
+      recipient: project.owner,
+      type: "invitation_accepted",
+      title: "Invitation accepted",
+      message: `${req.user.name} accepted your invitation to join "${project.title}".`,
+      project: project._id,
+      invitation: invitation._id
+    });
+
     res.json({ success: true, message: "Invitation accepted", projectId: project._id, projectName: project.title });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -274,6 +314,18 @@ const rejectInvitation = async (req, res) => {
 
     invitation.status = "rejected";
     await invitation.save();
+
+    const project = await Project.findById(invitation.project);
+    if (project) {
+      await createNotification({
+        recipient: project.owner,
+        type: "invitation_rejected",
+        title: "Invitation declined",
+        message: `${req.user.name} declined your invitation to join "${project.title}".`,
+        project: project._id,
+        invitation: invitation._id
+      });
+    }
 
     res.json({ success: true, message: "Invitation rejected" });
   } catch (error) {
