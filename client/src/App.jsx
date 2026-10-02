@@ -8,6 +8,9 @@ import Landing from "./pages/Landing";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
+import ProjectList from "./pages/projects/ProjectList";
+import ProjectCreate from "./pages/projects/ProjectCreate";
+import ProjectDetail from "./pages/projects/ProjectDetail";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
@@ -26,6 +29,21 @@ export default function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects" element={
+            <ProtectedRoute>
+              <ProjectList />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects/new" element={
+            <ProtectedRoute>
+              <ProjectCreate />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects/:id" element={
+            <ProtectedRoute>
+              <ProjectDetail />
             </ProtectedRoute>
           } />
           
