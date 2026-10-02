@@ -6,19 +6,6 @@ import { useAuth } from "../context/AuthContext";
 import NewProjectModal from "../components/NewProjectModal";
 import ProjectCard from "../components/dashboard/ProjectCard";
 
-// DEMO DATA: replace with API calls once the Task / Activity backends are implemented.
-const DEMO = { activeTasks: 8, completed: 12, progress: 65 };
-const ACTIVITY = [
-  { who: "You", text: "uploaded dataset.csv", when: "2 hours ago", letter: "H" },
-  { who: "Rahul S.", text: "completed Literature Review", when: "5 hours ago", letter: "R" },
-  { who: "Dr. Priya", text: "commented on Research Paper Draft", when: "Yesterday", letter: "P" },
-  { who: "New Member", text: "joined AI Research Project", when: "2 days ago", letter: "N" },
-];
-const UPCOMING = [
-  { title: "Submit literature review", due: "Tomorrow" },
-  { title: "Review dataset with team", due: "In 3 days" },
-  { title: "Draft methodology section", due: "Next week" },
-];
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -66,9 +53,9 @@ export default function Dashboard() {
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <Stat icon={FolderKanban} label="Projects" value={projects.length} tone="bg-blue-50 text-blue-600" />
-        <Stat icon={Clock} label="Active Tasks" value={DEMO.activeTasks} tone="bg-orange-50 text-orange-500" />
-        <Stat icon={ListChecks} label="Completed" value={DEMO.completed} tone="bg-emerald-50 text-emerald-600" />
-        <Stat icon={TrendingUp} label="Progress" value={`${DEMO.progress}%`} tone="bg-purple-50 text-purple-600" />
+        <Stat icon={Clock} label="Active Tasks" value={0} tone="bg-orange-50 text-orange-500" />
+        <Stat icon={ListChecks} label="Completed" value={0} tone="bg-emerald-50 text-emerald-600" />
+        <Stat icon={TrendingUp} label="Progress" value="—" tone="bg-purple-50 text-purple-600" />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
@@ -99,31 +86,21 @@ export default function Dashboard() {
               <h2 className="text-lg font-bold text-slate-900">Upcoming Tasks</h2>
               <Link to="/tasks" className="text-sm font-medium text-primary-600 hover:underline">View All</Link>
             </div>
-            <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
-              {UPCOMING.map((t) => (
-                <div key={t.title} className="flex items-center justify-between px-5 py-4 text-sm">
-                  <span className="font-medium text-slate-800">{t.title}</span>
-                  <span className="text-slate-500">{t.due}</span>
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-10 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3"><Clock size={20} /></div>
+              <h3 className="font-semibold text-slate-900 mb-1">No upcoming tasks</h3>
+              <p className="text-sm text-slate-500 max-w-sm">Tasks assigned to you across all projects will appear here.</p>
             </div>
           </section>
         </div>
 
         <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-base font-bold text-slate-900">Recent Activity</h2>
-          <ul className="mt-5 divide-y divide-slate-100">
-            {ACTIVITY.map((a) => (
-              <li key={a.text} className="flex gap-3 py-4 first:pt-0">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-600">{a.letter}</div>
-                <div>
-                  <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">{a.who}</span> {a.text}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">{a.when}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <Link to="/notifications" className="mt-2 block text-center text-sm font-medium text-slate-600 hover:text-primary-600">View All Activity</Link>
+          <div className="py-8 text-center flex flex-col items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3"><TrendingUp size={20} /></div>
+            <p className="text-sm font-semibold text-slate-900 mb-1">No recent activity</p>
+            <p className="text-xs text-slate-500 max-w-[200px]">Team activities and updates will show up here.</p>
+          </div>
         </aside>
       </div>
 
