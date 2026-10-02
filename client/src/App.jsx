@@ -8,10 +8,14 @@ import Landing from "./pages/Landing";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
-import ProjectList from "./pages/projects/ProjectList";
-import ProjectCreate from "./pages/projects/ProjectCreate";
-import ProjectDetail from "./pages/projects/ProjectDetail";
-import ComingSoon from "./pages/ComingSoon";
+import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
+import Tasks from "./pages/Tasks";
+import Documents from "./pages/Documents";
+import Team from "./pages/Team";
+import Chat from "./pages/Chat";
+import Notifications from "./pages/Notifications";
+import Settings from "./pages/Settings";
 import DashboardLayout from "./components/DashboardLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -30,22 +34,18 @@ export default function App() {
           {/* Protected app routes (sidebar layout) */}
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
-            
-            {/* Project routes */}
-            <Route path="/projects" element={<ProjectList />} />
-            <Route path="/projects/new" element={<ProjectCreate />} />
+            <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:id" element={<ProjectDetail />} />
-            
-            {/* Other routes */}
-            <Route path="/tasks" element={<ComingSoon title="Tasks" />} />
-            <Route path="/documents" element={<ComingSoon title="Documents" />} />
-            <Route path="/resources" element={<ComingSoon title="Resources" />} />
-            <Route path="/papers" element={<ComingSoon title="Research Papers" />} />
-            <Route path="/team" element={<ComingSoon title="Team" />} />
-            <Route path="/chat" element={<ComingSoon title="Chat" />} />
-            <Route path="/notifications" element={<ComingSoon title="Notifications" />} />
-            <Route path="/settings" element={<ComingSoon title="Settings" />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/resources" element={<Documents defaultCategory="dataset" />} />
+            <Route path="/papers" element={<Documents defaultCategory="paper" />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
+
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={
@@ -63,3 +63,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
