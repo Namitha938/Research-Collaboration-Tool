@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import ProjectList from "./pages/projects/ProjectList";
 import ProjectCreate from "./pages/projects/ProjectCreate";
 import ProjectDetail from "./pages/projects/ProjectDetail";
+import InvitationPage from "./pages/projects/InvitationPage";
 import ComingSoon from "./pages/ComingSoon";
 import DashboardLayout from "./components/DashboardLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/invitations/:token" element={<InvitationPage />} />
           
           {/* Protected app routes (sidebar layout) */}
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -41,7 +43,7 @@ export default function App() {
             <Route path="/documents" element={<ComingSoon title="Documents" />} />
             <Route path="/resources" element={<ComingSoon title="Resources" />} />
             <Route path="/papers" element={<ComingSoon title="Research Papers" />} />
-            <Route path="/team" element={<ComingSoon title="Team" />} />
+            <Route path="/team" element={<Navigate to="/projects" replace />} />
             <Route path="/chat" element={<ComingSoon title="Chat" />} />
             <Route path="/notifications" element={<ComingSoon title="Notifications" />} />
             <Route path="/settings" element={<ComingSoon title="Settings" />} />

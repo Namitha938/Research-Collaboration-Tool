@@ -3,11 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import { getProjectById } from '../../api/projectService';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, Database, BookOpen, MessageSquare } from 'lucide-react';
+import TeamTab from '../../components/team/TeamTab';
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('Overview');
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -101,11 +103,14 @@ const ProjectDetail = () => {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Team Members</p>
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
-                {project.members?.slice(0, 3).map((member, idx) => (
-                  <div key={idx} className="w-7 h-7 rounded-full bg-primary-100 text-primary-700 border-2 border-white flex items-center justify-center text-xs font-bold" title={member.name}>
-                    {member.name.charAt(0)}
-                  </div>
-                ))}
+                {project.members?.slice(0, 3).map((member, idx) => {
+                  const userName = member.user?.name || member.name || "U";
+                  return (
+                    <div key={idx} className="w-7 h-7 rounded-full bg-primary-100 text-primary-700 border-2 border-white flex items-center justify-center text-xs font-bold" title={userName}>
+                      {userName.charAt(0)}
+                    </div>
+                  );
+                })}
               </div>
               <span className="text-sm font-medium text-slate-600">{project.members?.length} total</span>
             </div>
@@ -119,8 +124,9 @@ const ProjectDetail = () => {
           {tabs.map((tab, idx) => (
             <button 
               key={idx}
+              onClick={() => setActiveTab(tab.name)}
               className={`flex items-center gap-2 px-5 py-4 text-sm font-medium transition-colors border-b-2 ${
-                idx === 0 
+                activeTab === tab.name 
                   ? 'border-primary-600 text-primary-600' 
                   : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
               }`}
@@ -131,38 +137,41 @@ const ProjectDetail = () => {
         </div>
       </div>
 
-      {/* Tab Content Placeholders */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 min-h-[300px] flex flex-col items-center justify-center text-center">
-            <CheckSquare size={48} className="text-slate-200 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Tasks Module (Coming Soon)</h3>
-            <p className="text-slate-500 max-w-md text-sm">Create milestones, assign tasks to team members, and track progress using Kanban boards.</p>
-          </div>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h3 className="font-bold text-slate-900 mb-4">Project Progress</h3>
-            <div className="flex justify-between text-sm font-medium mb-2">
-              <span className="text-slate-600">Overall</span>
-              <span className="text-slate-900">{project.progress}%</span>
-            </div>
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary-500 rounded-full" 
-                style={{ width: `${project.progress}%` }}
-              ></div>
+      {activeTab === 'Team' ? (
+        <TeamTab project={project} />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 min-h-[300px] flex flex-col items-center justify-center text-center">
+              <CheckSquare size={48} className="text-slate-200 mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">{activeTab} Module (Coming Soon)</h3>
+              <p className="text-slate-500 max-w-md text-sm">This module is currently under development.</p>
             </div>
           </div>
+          
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+              <h3 className="font-bold text-slate-900 mb-4">Project Progress</h3>
+              <div className="flex justify-between text-sm font-medium mb-2">
+                <span className="text-slate-600">Overall</span>
+                <span className="text-slate-900">{project.progress}%</span>
+              </div>
+              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary-500 rounded-full" 
+                  style={{ width: `${project.progress}%` }}
+                ></div>
+              </div>
+            </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 min-h-[200px] flex flex-col items-center justify-center text-center">
-            <Activity size={32} className="text-slate-200 mb-3" />
-            <h3 className="text-base font-semibold text-slate-700">Recent Activity</h3>
-            <p className="text-slate-400 text-sm mt-1">No recent activity</p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 min-h-[200px] flex flex-col items-center justify-center text-center">
+              <Activity size={32} className="text-slate-200 mb-3" />
+              <h3 className="text-base font-semibold text-slate-700">Recent Activity</h3>
+              <p className="text-slate-400 text-sm mt-1">No recent activity</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

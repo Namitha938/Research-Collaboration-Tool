@@ -31,9 +31,27 @@ app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 // Health check
 app.get("/api/health", (req, res) => res.json({ success: true, message: "Research Collaboration Tool API is running" }));
 
+// Temporary test email endpoint
+app.get("/api/test-email", async (req, res) => {
+  try {
+    const sendEmail = require("./utils/sendEmail");
+    await sendEmail({
+      to: process.env.EMAIL_USER,
+      subject: "ResearchHub Email Test",
+      html: `<h2>ResearchHub Email Test</h2>
+<p>Nodemailer and Gmail SMTP are working correctly.</p>
+<p>This is a temporary development test.</p>`
+    });
+    res.json({ success: true, message: "Test email sent successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to send test email" });
+  }
+});
+
 // Mount routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
+app.use("/api/invitations", require("./routes/invitationRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);

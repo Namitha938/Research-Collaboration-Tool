@@ -16,7 +16,7 @@ const createProject = async (req, res) => {
       description,
       researchArea,
       owner: req.user._id,
-      members: [req.user._id],
+      members: [{ user: req.user._id, role: "owner" }],
       startDate,
       deadline,
       status: "active",
@@ -37,10 +37,10 @@ const getProjects = async (req, res) => {
   try {
     // Find projects where the user is either the owner or a member
     const projects = await Project.find({
-      $or: [{ owner: req.user._id }, { members: req.user._id }],
+      $or: [{ owner: req.user._id }, { "members.user": req.user._id }],
     })
       .populate("owner", "name email")
-      .populate("members", "name email")
+      .populate("members.user", "name email")
       .sort({ updatedAt: -1 });
 
     res.json({ success: true, projects });
@@ -56,7 +56,7 @@ const getProjectById = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id)
       .populate("owner", "name email")
-      .populate("members", "name email");
+      .populate("members.user", "name email");
 
     if (!project) {
       return res.status(404).json({ success: false, message: "Project not found" });
@@ -64,7 +64,7 @@ const getProjectById = async (req, res) => {
 
     // Check authorization: must be owner or member
     const isOwner = project.owner._id.toString() === req.user._id.toString();
-    const isMember = project.members.some((member) => member._id.toString() === req.user._id.toString());
+    const isMember = project.members.some((member) => member.user?._id?.toString() === req.user._id.toString());
 
     if (!isOwner && !isMember) {
       return res.status(403).json({ success: false, message: "Not authorized to access this project" });
@@ -97,7 +97,7 @@ const updateProject = async (req, res) => {
       runValidators: true,
     })
       .populate("owner", "name email")
-      .populate("members", "name email");
+      .populate("members.user", "name email");
 
     res.json({ success: true, project: updatedProject });
   } catch (error) {

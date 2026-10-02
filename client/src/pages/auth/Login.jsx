@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AuthLayout from '../../components/AuthLayout';
@@ -14,6 +14,10 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect');
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -27,7 +31,11 @@ const Login = () => {
       if (response.data.success) {
         login(response.data.token, response.data.user);
         toast.success(response.data.message || 'Login successful!');
-        navigate('/dashboard');
+        if (redirect && redirect.startsWith('/')) {
+          navigate(redirect);
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to connect to the server';

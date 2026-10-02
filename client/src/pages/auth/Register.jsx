@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AuthLayout from '../../components/AuthLayout';
@@ -10,7 +10,17 @@ import { useAuth } from '../../context/AuthContext';
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'researcher' });
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect');
+  const emailParam = searchParams.get('email');
+
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: emailParam || '', 
+    password: '', 
+    role: 'researcher' 
+  });
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -27,7 +37,11 @@ const Register = () => {
       if (response.data.success) {
         login(response.data.token, response.data.user);
         toast.success(response.data.message || 'Registration successful!');
-        navigate('/dashboard');
+        if (redirect && redirect.startsWith('/')) {
+          navigate(redirect);
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to connect to the server';
