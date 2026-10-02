@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { X, UploadCloud, FileText } from "lucide-react";
+import { X, UploadCloud } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
+
+const field =
+  "w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20";
 
 export default function UploadDocumentModal({ onClose, onUploaded, defaultProjectId }) {
   const [projects, setProjects] = useState([]);
   const [file, setFile] = useState(null);
-  const [title, setTitle] = useState("");
-  const [project, setProject] = useState(defaultProjectId || "");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [category, setCategory] = useState("paper");
+  const [project, setProject] = useState(defaultProjectId || "");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -28,9 +32,9 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
     const selected = e.target.files[0];
     if (selected) {
       setFile(selected);
-      if (!title) {
+      if (!name) {
         const nameWithoutExt = selected.name.replace(/\.[^/.]+$/, "");
-        setTitle(nameWithoutExt);
+        setName(nameWithoutExt);
       }
     }
   };
@@ -48,13 +52,13 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
 
     setUploading(true);
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("title", title || file.name);
-    formData.append("project", project);
+    formData.append("document", file); // Must match upload.single("document")
+    formData.append("name", name || file.name);
+    formData.append("description", description);
     formData.append("category", category);
 
     try {
-      const res = await api.post("/documents", formData, {
+      const res = await api.post(`/projects/${project}/documents`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Document uploaded successfully!");
@@ -69,29 +73,31 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white dark:bg-slate-900 p-6 shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Upload Research Asset</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+      <div className="w-full max-w-lg max-h-[95vh] overflow-y-auto space-y-4 rounded-2xl bg-white p-6 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900">Upload Research Asset</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+            aria-label="Close"
+            className="text-slate-400 hover:text-slate-600 transition"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            <label className="mb-1 block text-xs font-medium text-slate-500">
               File <span className="text-rose-500">*</span>
             </label>
-            <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-6 text-center hover:border-indigo-500 transition">
-              <UploadCloud className="w-8 h-8 text-indigo-500 mb-2" />
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+            <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center hover:border-primary-500 transition">
+              <UploadCloud className="w-8 h-8 text-primary-500 mb-2" />
+              <p className="text-sm font-medium text-slate-700">
                 {file ? file.name : "Click or drag file to upload"}
               </p>
-              <p className="text-xs text-slate-400 mt-1">PDF, DOCX, CSV, ZIP up to 30MB</p>
+              <p className="text-xs text-slate-400 mt-1">PDF, DOCX, CSV up to 10MB</p>
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -102,28 +108,41 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-              Document Title <span className="text-rose-500">*</span>
+            <label className="mb-1 block text-xs font-medium text-slate-500">
+              Document Name <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Deep Learning Transformer Paper Draft"
               required
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-500"
+              className={field}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-500">
+              Description
+            </label>
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Briefly describe this document"
+              className={field}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-500"
+                className={field}
               >
                 <option value="paper">Paper / Manuscript</option>
                 <option value="dataset">Dataset / Raw Data</option>
@@ -134,14 +153,14 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
                 Project <span className="text-rose-500">*</span>
               </label>
               <select
                 value={project}
                 onChange={(e) => setProject(e.target.value)}
                 required
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-500"
+                className={field}
               >
                 <option value="" disabled>Select project</option>
                 {projects.map((p) => (
@@ -153,18 +172,18 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="mt-4 flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium transition hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={uploading}
-              className="rounded-xl bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition shadow-sm"
+              className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-60"
             >
               {uploading ? "Uploading..." : "Upload Document"}
             </button>

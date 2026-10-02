@@ -54,6 +54,7 @@ app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/invitations", require("./routes/invitationRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
+app.use("/api", require("./routes/documentRoutes"));
 app.use("/api", require("./routes/taskRoutes"));
 
 app.use(notFound);
@@ -61,5 +62,5 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
-  server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
 });

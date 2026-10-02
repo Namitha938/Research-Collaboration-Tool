@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, Database, BookOpen, MessageSquare } from 'lucide-react';
 import TeamTab from '../../components/team/TeamTab';
 import Tasks from '../Tasks';
+import DocumentsTab from '../../components/documents/DocumentsTab';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -142,6 +143,8 @@ const ProjectDetail = () => {
         <TeamTab project={project} />
       ) : activeTab === 'Tasks' ? (
         <Tasks projectId={project._id} />
+      ) : activeTab === 'Documents' ? (
+        <DocumentsTab projectId={project._id} project={project} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">

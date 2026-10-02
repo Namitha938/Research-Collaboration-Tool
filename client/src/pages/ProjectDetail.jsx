@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import NewTaskModal from "../components/NewTaskModal";
+import UploadDocumentModal from "../components/UploadDocumentModal";
+import { FileText, Download } from "lucide-react";
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -20,20 +22,24 @@ export default function ProjectDetail() {
 
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
 
   const fetchProjectData = async () => {
     try {
-      const [projRes, tasksRes] = await Promise.all([
+      const [projRes, tasksRes, docsRes] = await Promise.all([
         api.get(`/projects/${id}`),
-        api.get(`/tasks?project=${id}`),
+        api.get(`/projects/${id}/tasks`), // Corrected route based on standard setup
+        api.get(`/projects/${id}/documents`).catch(() => ({ data: { documents: [] } }))
       ]);
       setProject(projRes.data.project);
       setTasks(tasksRes.data.tasks || []);
+      setDocuments(docsRes.data.documents || []);
     } catch (err) {
       toast.error(err.response?.data?.message || "Could not load project");
       navigate("/projects");
@@ -117,6 +123,25 @@ export default function ProjectDetail() {
     } catch (err) {
       toast.error("Failed to delete task");
     }
+  };
+
+  const handleDeleteDocument = async (docId) => {
+    if (!window.confirm("Delete this document?")) return;
+    try {
+      await api.delete(`/documents/${docId}`);
+      setDocuments((prev) => prev.filter((d) => d._id !== docId));
+      toast.success("Document removed");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete document");
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (!bytes || bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
   if (loading) {
@@ -243,6 +268,19 @@ export default function ProjectDetail() {
             Team Members
             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
               {project.members?.length || 1}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab("documents")}
+            className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-semibold transition-colors ${
+              activeTab === "documents"
+                ? "border-primary-600 text-primary-600"
+                : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            Documents
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+              {documents.length}
             </span>
           </button>
         </nav>
@@ -464,6 +502,94 @@ export default function ProjectDetail() {
         </div>
       )}
 
+      {activeTab === "documents" && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-slate-900">Project Documents</h2>
+            <button
+              onClick={() => setShowDocumentModal(true)}
+              className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-primary-700"
+            >
+              <Plus size={15} /> Upload Document
+            </button>
+          </div>
+
+          {documents.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+              <p className="text-sm text-slate-500">No documents in this project yet.</p>
+              <button
+                onClick={() => setShowDocumentModal(true)}
+                className="mt-4 rounded-lg bg-primary-600 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700"
+              >
+                Upload First Document
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <table className="w-full text-left text-sm text-slate-600">
+                <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+                  <tr>
+                    <th className="px-6 py-3.5">Document</th>
+                    <th className="px-6 py-3.5">Uploaded By</th>
+                    <th className="px-6 py-3.5">Size</th>
+                    <th className="px-6 py-3.5">Date</th>
+                    <th className="px-6 py-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {documents.map((d) => (
+                    <tr key={d._id} className="hover:bg-slate-50/70">
+                      <td className="px-6 py-4 font-medium text-slate-900">
+                        <div className="flex items-center gap-3">
+                          <FileText size={16} className="text-primary-500" />
+                          <div>
+                            <div>{d.name}</div>
+                            {d.description && (
+                              <div className="line-clamp-1 text-xs font-normal text-slate-400">
+                                {d.description}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-600">
+                        {d.uploadedBy?.name || "Unknown"}
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-500">
+                        {formatFileSize(d.fileSize)}
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-500">
+                        {new Date(d.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-right flex items-center justify-end gap-3">
+                        <a
+                          href={d.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-slate-400 hover:text-primary-600"
+                          title="Download/View"
+                        >
+                          <Download size={16} />
+                        </a>
+                        {isOwner && (
+                          <button
+                            onClick={() => handleDeleteDocument(d._id)}
+                            className="text-slate-400 hover:text-red-600"
+                            title="Delete Document"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {showTaskModal && (
         <NewTaskModal
           defaultProjectId={id}
@@ -471,6 +597,15 @@ export default function ProjectDetail() {
           onCreated={(newTask) => {
             setTasks((prev) => [newTask, ...prev]);
             api.get(`/projects/${id}`).then((res) => setProject(res.data.project));
+          }}
+        />
+      )}
+      {showDocumentModal && (
+        <UploadDocumentModal
+          defaultProjectId={id}
+          onClose={() => setShowDocumentModal(false)}
+          onUploaded={(newDoc) => {
+            setDocuments((prev) => [newDoc, ...prev]);
           }}
         />
       )}

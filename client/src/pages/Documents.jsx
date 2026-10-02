@@ -10,6 +10,7 @@ import {
   FileSpreadsheet,
   FileCode,
   FileArchive,
+  Eye,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
@@ -70,6 +71,20 @@ export default function Documents({ defaultCategory }) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
+  const handleDownload = async (docId) => {
+    try {
+      const toastId = toast.loading("Preparing download...");
+      const res = await api.get(`/documents/${docId}/download`);
+      if (res.data.downloadUrl) {
+        toast.dismiss(toastId);
+        window.location.href = res.data.downloadUrl;
+      }
+    } catch (err) {
+      toast.dismiss();
+      toast.error("Failed to prepare download");
+    }
+  };
+
   const categories = [
     { id: "all", name: "All Assets" },
     { id: "paper", name: "Papers & Publications" },
@@ -80,6 +95,7 @@ export default function Documents({ defaultCategory }) {
   ];
 
   return (
+    <>
     <div className="mx-auto max-w-7xl animate-fade-in space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -159,14 +175,14 @@ export default function Documents({ defaultCategory }) {
                           <FileText size={18} />
                         </div>
                         <div>
-                          <p className="font-semibold text-sm text-slate-900">{doc.title}</p>
-                          <p className="text-xs text-slate-400">{doc.fileName}</p>
+                          <p className="font-semibold text-sm text-slate-900">{doc.name}</p>
+                          {doc.description && <p className="text-xs text-slate-400 line-clamp-1">{doc.description}</p>}
                         </div>
                       </div>
                     </td>
                     <td className="p-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
-                        {doc.category}
+                        {doc.category || "Other"}
                       </span>
                     </td>
                     <td className="p-4 text-sm font-medium text-slate-700">
@@ -182,18 +198,24 @@ export default function Documents({ defaultCategory }) {
                       <div className="flex items-center justify-end gap-2">
                         {doc.fileUrl && (
                           <a
-                            href={doc.fileUrl.startsWith("http") ? doc.fileUrl : `http://localhost:5000${doc.fileUrl}`}
+                            href={doc.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            download
                             className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition"
-                            title="Download document"
+                            title="View document"
                           >
-                            <Download size={16} />
+                            <Eye size={16} />
                           </a>
                         )}
                         <button
-                          onClick={() => handleDelete(doc._id, doc.title)}
+                          onClick={() => handleDownload(doc._id)}
+                          className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition"
+                          title="Download document"
+                        >
+                          <Download size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(doc._id, doc.name)}
                           className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
                           title="Delete document"
                         >
@@ -208,13 +230,14 @@ export default function Documents({ defaultCategory }) {
           </div>
         )}
       </div>
-
-      {showUploadModal && (
-        <UploadDocumentModal
-          onClose={() => setShowUploadModal(false)}
-          onUploaded={() => fetchDocuments()}
-        />
-      )}
     </div>
+
+    {showUploadModal && (
+      <UploadDocumentModal
+        onClose={() => setShowUploadModal(false)}
+        onUploaded={() => fetchDocuments()}
+      />
+    )}
+    </>
   );
 }
