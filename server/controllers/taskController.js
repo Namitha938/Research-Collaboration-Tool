@@ -2,6 +2,7 @@ const Task = require("../models/Task");
 const Project = require("../models/Project");
 const User = require("../models/User");
 const mongoose = require("mongoose");
+const createNotification = require("../utils/createNotification");
 
 // Helper to check project membership and get role
 const checkProjectMembership = async (projectId, userId) => {
@@ -69,6 +70,17 @@ const createTask = async (req, res) => {
     const populatedTask = await Task.findById(task._id)
       .populate("assignedTo", "name email")
       .populate("createdBy", "name email");
+
+    if (assignedTo && assignedTo.toString() !== req.user._id.toString()) {
+      await createNotification({
+        recipient: assignedTo,
+        type: "task_assigned",
+        title: "New task assigned",
+        message: `${req.user.name} assigned you the task "${title}".`,
+        project: projectId,
+        task: task._id
+      });
+    }
 
     res.status(201).json({ success: true, message: "Task created successfully", task: populatedTask });
   } catch (error) {
@@ -155,6 +167,8 @@ const updateTask = async (req, res) => {
       }
     }
 
+    const oldAssignedTo = task.assignedTo ? task.assignedTo.toString() : null;
+
     if (assignedTo !== undefined && assignedTo !== task.assignedTo?.toString()) {
       if (assignedTo === null || assignedTo === "") {
         task.assignedTo = null;
@@ -174,6 +188,17 @@ const updateTask = async (req, res) => {
     task.dueDate = parsedDueDate;
 
     await task.save();
+
+    if (assignedTo && assignedTo !== oldAssignedTo && assignedTo !== req.user._id.toString()) {
+      await createNotification({
+        recipient: assignedTo,
+        type: oldAssignedTo ? "task_reassigned" : "task_assigned",
+        title: oldAssignedTo ? "Task assigned to you" : "New task assigned",
+        message: `${req.user.name} assigned you the task "${task.title}".`,
+        project: task.project,
+        task: task._id
+      });
+    }
 
     const populatedTask = await Task.findById(task._id)
       .populate("assignedTo", "name email")
@@ -218,6 +243,20 @@ const updateTaskStatus = async (req, res) => {
     task.status = status;
     await task.save();
 
+    if (status === "completed" && current !== "completed") {
+      const taskProject = await Project.findById(task.project);
+      if (taskProject && taskProject.owner.toString() !== req.user._id.toString()) {
+        await createNotification({
+          recipient: taskProject.owner,
+          type: "task_completed",
+          title: "Task completed",
+          message: `${req.user.name} completed the task "${task.title}".`,
+          project: task.project,
+          task: task._id
+        });
+      }
+    }
+
     const populatedTask = await Task.findById(task._id)
       .populate("assignedTo", "name email")
       .populate("createdBy", "name email");
@@ -246,6 +285,8 @@ const assignTask = async (req, res) => {
       return res.status(403).json({ success: false, message: "You do not have permission to perform this action." });
     }
 
+    const oldAssignedTo = task.assignedTo ? task.assignedTo.toString() : null;
+
     if (assignedTo === null || assignedTo === "") {
       task.assignedTo = null;
     } else {
@@ -257,6 +298,17 @@ const assignTask = async (req, res) => {
       task.assignedTo = assignedTo;
     }
     await task.save();
+
+    if (assignedTo && assignedTo !== oldAssignedTo && assignedTo !== req.user._id.toString()) {
+      await createNotification({
+        recipient: assignedTo,
+        type: oldAssignedTo ? "task_reassigned" : "task_assigned",
+        title: oldAssignedTo ? "Task assigned to you" : "New task assigned",
+        message: `${req.user.name} assigned you the task "${task.title}".`,
+        project: task.project,
+        task: task._id
+      });
+    }
 
     const populatedTask = await Task.findById(task._id)
       .populate("assignedTo", "name email")
