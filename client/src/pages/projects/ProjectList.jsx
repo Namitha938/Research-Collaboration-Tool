@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import ProjectCard from '../../components/dashboard/ProjectCard';
 import { Plus, Search, Filter, FolderKanban } from 'lucide-react';
 import { getProjects } from '../../api/projectService';
@@ -27,7 +26,7 @@ const ProjectList = () => {
   }, []);
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">My Research Projects</h1>
@@ -78,7 +77,7 @@ const ProjectList = () => {
           </Link>
         </div>
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

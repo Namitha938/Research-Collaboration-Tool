@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { createProject } from '../../api/projectService';
 import toast from 'react-hot-toast';
 import { Save, ArrowLeft } from 'lucide-react';
@@ -37,7 +36,7 @@ const ProjectCreate = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-3xl mx-auto">
         <button 
           onClick={() => navigate('/projects')}
@@ -134,7 +133,7 @@ const ProjectCreate = () => {
           </form>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

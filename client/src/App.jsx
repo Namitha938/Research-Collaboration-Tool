@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import ProjectList from "./pages/projects/ProjectList";
 import ProjectCreate from "./pages/projects/ProjectCreate";
 import ProjectDetail from "./pages/projects/ProjectDetail";
+import ComingSoon from "./pages/ComingSoon";
+import DashboardLayout from "./components/DashboardLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
@@ -25,28 +27,25 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Protected Normal Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/projects" element={
-            <ProtectedRoute>
-              <ProjectList />
-            </ProtectedRoute>
-          } />
-          <Route path="/projects/new" element={
-            <ProtectedRoute>
-              <ProjectCreate />
-            </ProtectedRoute>
-          } />
-          <Route path="/projects/:id" element={
-            <ProtectedRoute>
-              <ProjectDetail />
-            </ProtectedRoute>
-          } />
-          
+          {/* Protected app routes (sidebar layout) */}
+          <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Project routes */}
+            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects/new" element={<ProjectCreate />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
+            
+            {/* Other routes */}
+            <Route path="/tasks" element={<ComingSoon title="Tasks" />} />
+            <Route path="/documents" element={<ComingSoon title="Documents" />} />
+            <Route path="/resources" element={<ComingSoon title="Resources" />} />
+            <Route path="/papers" element={<ComingSoon title="Research Papers" />} />
+            <Route path="/team" element={<ComingSoon title="Team" />} />
+            <Route path="/chat" element={<ComingSoon title="Chat" />} />
+            <Route path="/notifications" element={<ComingSoon title="Notifications" />} />
+            <Route path="/settings" element={<ComingSoon title="Settings" />} />
+          </Route>
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={

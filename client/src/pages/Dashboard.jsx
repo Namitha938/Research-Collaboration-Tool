@@ -1,181 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import DashboardLayout from '../components/dashboard/DashboardLayout';
-import ProjectCard from '../components/dashboard/ProjectCard';
-import TaskCard from '../components/dashboard/TaskCard';
-import ActivityItem from '../components/dashboard/ActivityItem';
-import { FolderKanban, CheckSquare, ListChecks, TrendingUp, Plus, Atom } from 'lucide-react';
-import { getProjects } from '../api/projectService';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FolderKanban, Clock, ListChecks, TrendingUp, Plus } from "lucide-react";
+import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
+import NewProjectModal from "../components/NewProjectModal";
+import ProjectCard from "../components/dashboard/ProjectCard";
 
-const Dashboard = () => {
+// DEMO DATA: replace with API calls once the Task / Activity backends are implemented.
+const DEMO = { activeTasks: 8, completed: 12, progress: 65 };
+const ACTIVITY = [
+  { who: "You", text: "uploaded dataset.csv", when: "2 hours ago", letter: "H" },
+  { who: "Rahul S.", text: "completed Literature Review", when: "5 hours ago", letter: "R" },
+  { who: "Dr. Priya", text: "commented on Research Paper Draft", when: "Yesterday", letter: "P" },
+  { who: "New Member", text: "joined AI Research Project", when: "2 days ago", letter: "N" },
+];
+const UPCOMING = [
+  { title: "Submit literature review", due: "Tomorrow" },
+  { title: "Review dataset with team", due: "In 3 days" },
+  { title: "Draft methodology section", due: "Next week" },
+];
+
+const greeting = () => {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+};
+
+function Stat({ icon: Icon, label, value, tone }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${tone}`}><Icon size={18} /></div>
+        <span className="text-sm font-medium text-slate-600">{label}</span>
+      </div>
+      <p className="mt-4 text-2xl font-bold text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await getProjects();
-        if (response.success) {
-          setProjects(response.projects);
-        }
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        toast.error("Failed to load dashboard data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchDashboardData();
+    api.get("/projects").then((r) => setProjects(r.data.projects)).catch(() => {});
   }, []);
 
-  const greeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  };
-
   return (
-    <DashboardLayout>
-      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div className="mx-auto max-w-[1300px] animate-fade-in">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-1">
-            {greeting()}, {user?.name?.split(' ')[0] || 'User'} 👋
-          </h1>
-          <p className="text-sm text-slate-500">Here's what's happening with your research today.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{greeting()}, {user?.name} 👋</h1>
+          <p className="mt-1 text-sm text-slate-500">Here's what's happening with your research today.</p>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Link to="/projects/new" className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-            <Plus size={18} /> New Project
-          </Link>
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+        <div className="flex gap-3">
+          <button onClick={() => setShowModal(true)} className="flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
+            <Plus size={16} /> New Project
+          </button>
+          <button onClick={() => navigate("/documents")} className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
             Upload
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><FolderKanban size={18} /></div>
-            <span className="text-sm font-medium text-slate-600">Total Projects</span>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900">{isLoading ? '-' : projects.length}</h3>
-        </div>
-        
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><CheckSquare size={18} /></div>
-            <span className="text-sm font-medium text-slate-600">Active Tasks</span>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900">0</h3>
-        </div>
-        
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><ListChecks size={18} /></div>
-            <span className="text-sm font-medium text-slate-600">Completed Tasks</span>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900">0</h3>
-        </div>
-        
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><TrendingUp size={18} /></div>
-            <span className="text-sm font-medium text-slate-600">Overall Progress</span>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900">—</h3>
-        </div>
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <Stat icon={FolderKanban} label="Projects" value={projects.length} tone="bg-blue-50 text-blue-600" />
+        <Stat icon={Clock} label="Active Tasks" value={DEMO.activeTasks} tone="bg-orange-50 text-orange-500" />
+        <Stat icon={ListChecks} label="Completed" value={DEMO.completed} tone="bg-emerald-50 text-emerald-600" />
+        <Stat icon={TrendingUp} label="Progress" value={`${DEMO.progress}%`} tone="bg-purple-50 text-purple-600" />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Main Content Area - 2 Columns wide on XL */}
-        <div className="xl:col-span-2 space-y-8">
-          
-          {/* Projects Section */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        <div className="space-y-8 lg:col-span-2">
           <section>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-900">My Research Projects</h2>
-              {projects.length > 0 && (
-                <Link to="/projects" className="text-sm font-medium text-primary-600 hover:text-primary-700">View All</Link>
-              )}
+              <Link to="/projects" className="text-sm font-medium text-primary-600 hover:underline">View All</Link>
             </div>
-            
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1, 2].map((i) => (
-                  <div key={i} className="h-48 bg-slate-100 rounded-2xl animate-pulse"></div>
-                ))}
-              </div>
-            ) : projects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {projects.slice(0, 4).map(project => (
-                  <ProjectCard key={project._id} project={project} />
-                ))}
+            {projects.length === 0 ? (
+              <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400"><FolderKanban size={26} /></div>
+                <h3 className="mt-5 font-semibold text-slate-900">No research projects yet</h3>
+                <p className="mt-1 max-w-sm text-sm text-slate-500">Get started by creating your first project to organize tasks, documents, and team members.</p>
+                <button onClick={() => setShowModal(true)} className="mt-6 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
+                  Create Your First Project
+                </button>
               </div>
             ) : (
-              <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center flex flex-col items-center">
-                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                  <FolderKanban size={24} className="text-slate-400" />
-                </div>
-                <h3 className="text-base font-semibold text-slate-900 mb-1">No research projects yet</h3>
-                <p className="text-sm text-slate-500 mb-6 max-w-sm">Start your first research project and begin collaborating with your team.</p>
-                <Link to="/projects/new" className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                  + Create Research Project
-                </Link>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {projects.slice(0, 4).map((p) => <ProjectCard key={p._id} project={p} />)}
               </div>
             )}
           </section>
 
-          {/* Tasks Section */}
           <section>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-900">Upcoming Tasks</h2>
+              <Link to="/tasks" className="text-sm font-medium text-primary-600 hover:underline">View All</Link>
             </div>
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center flex flex-col items-center">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                <CheckSquare size={24} className="text-slate-400" />
-              </div>
-              <h3 className="text-base font-semibold text-slate-900 mb-1">No upcoming tasks</h3>
-              <p className="text-sm text-slate-500 max-w-sm">Tasks assigned to you across all projects will appear here.</p>
+            <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
+              {UPCOMING.map((t) => (
+                <div key={t.title} className="flex items-center justify-between px-5 py-4 text-sm">
+                  <span className="font-medium text-slate-800">{t.title}</span>
+                  <span className="text-slate-500">{t.due}</span>
+                </div>
+              ))}
             </div>
           </section>
         </div>
 
-        {/* Sidebar Activity - 1 Column wide on XL */}
-        <div className="space-y-8">
-          <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-            <h2 className="text-base font-bold text-slate-900 mb-5">Recent Activity</h2>
-            <div className="py-8 text-center flex flex-col items-center">
-              <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3">
-                <TrendingUp size={20} className="text-slate-400" />
-              </div>
-              <p className="text-sm font-medium text-slate-900 mb-1">No recent activity</p>
-              <p className="text-xs text-slate-500 text-center max-w-[200px]">Team activities and updates will show up here.</p>
-            </div>
-          </section>
-
-          <section className="bg-gradient-to-br from-primary-600 to-indigo-700 rounded-2xl shadow-sm p-6 text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <h2 className="text-lg font-bold mb-2">Upgrade to Pro</h2>
-              <p className="text-primary-100 text-sm mb-6 max-w-[200px]">Get access to advanced analytics, unlimited projects, and 500GB storage.</p>
-              <button className="bg-white text-primary-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors">
-                View Plans
-              </button>
-            </div>
-            <div className="absolute -right-4 -bottom-4 opacity-10">
-              <Atom size={120} />
-            </div>
-          </section>
-        </div>
+        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-base font-bold text-slate-900">Recent Activity</h2>
+          <ul className="mt-5 divide-y divide-slate-100">
+            {ACTIVITY.map((a) => (
+              <li key={a.text} className="flex gap-3 py-4 first:pt-0">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-600">{a.letter}</div>
+                <div>
+                  <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">{a.who}</span> {a.text}</p>
+                  <p className="mt-0.5 text-xs text-slate-400">{a.when}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Link to="/notifications" className="mt-2 block text-center text-sm font-medium text-slate-600 hover:text-primary-600">View All Activity</Link>
+        </aside>
       </div>
-    </DashboardLayout>
-  );
-};
 
-export default Dashboard;
+      {showModal && (
+        <NewProjectModal onClose={() => setShowModal(false)} onCreated={(p) => setProjects([p, ...projects])} />
+      )}
+    </div>
+  );
+}

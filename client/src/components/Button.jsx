@@ -13,6 +13,7 @@ const Button = ({
     primary: "bg-primary-600 text-white hover:bg-primary-700 shadow-sm shadow-primary-500/20 focus:ring-primary-500 border border-transparent",
     secondary: "bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm focus:ring-slate-200",
     outline: "border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500",
+    light: "bg-white text-slate-900 hover:bg-slate-100 border border-transparent shadow-xl shadow-white/10 focus:ring-white",
     ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-200"
   };
 

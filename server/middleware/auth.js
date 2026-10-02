@@ -1,23 +1,5 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-
-// Verifies the JWT and attaches the user to req.user
-const protect = async (req, res, next) => {
-  const header = req.headers.authorization;
-  if (!header || !header.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Not authorized, no token" });
-  }
-  try {
-    const decoded = jwt.verify(header.split(" ")[1], process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    if (!user || !user.isActive) {
-      return res.status(401).json({ message: "User not found or deactivated" });
-    }
-    req.user = user;
-    next();
-  } catch (err) {
-    res.status(401).json({ message: "Token invalid or expired" });
-  }
-};
+// Kept for backwards compatibility: re-exports the single working auth middleware.
+// (The old version read `decoded.id` and `user.isActive`, which don't exist, so it always returned 401.)
+const protect = require("./authMiddleware");
 
 module.exports = { protect };

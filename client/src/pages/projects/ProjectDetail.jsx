@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { getProjectById } from '../../api/projectService';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, Database, BookOpen, MessageSquare } from 'lucide-react';
@@ -28,24 +27,24 @@ const ProjectDetail = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <>
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-slate-200 w-1/4 rounded"></div>
           <div className="h-32 bg-slate-200 w-full rounded-xl"></div>
           <div className="h-64 bg-slate-200 w-full rounded-xl"></div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
   if (!project) {
     return (
-      <DashboardLayout>
+      <>
         <div className="text-center py-20">
           <h2 className="text-2xl font-bold text-slate-900">Project Not Found</h2>
           <Link to="/projects" className="text-primary-600 hover:underline mt-2 inline-block">Return to Projects</Link>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -60,7 +59,7 @@ const ProjectDetail = () => {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       <Link to="/projects" className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 mb-6 transition-colors inline-flex">
         <ArrowLeft size={16} /> Back to Projects
       </Link>
@@ -164,7 +163,7 @@ const ProjectDetail = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 
