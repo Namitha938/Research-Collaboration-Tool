@@ -10,7 +10,7 @@ import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
 
 import Projects from "./pages/Projects";
-import ProjectDetail from "./pages/ProjectDetail";
+
 import ProjectCreate from "./pages/projects/ProjectCreate";
 import ProjectDetail from "./pages/projects/ProjectDetail";
 import InvitationPage from "./pages/projects/InvitationPage";
