@@ -10,6 +10,7 @@ import ResearchPapersTab from '../../components/research-papers/ResearchPapersTa
 import ReferencesTab from '../../components/references/ReferencesTab';
 import MilestonesTab from '../../components/milestones/MilestonesTab';
 import ActivityTab from '../../components/activity/ActivityTab';
+import ChatTab from '../../components/chat/ChatTab';
 import { useAuth } from '../../context/AuthContext';
 
 const ProjectDetail = () => {
@@ -167,6 +168,8 @@ const ProjectDetail = () => {
           currentUserRole={project.members?.find(m => (m.user?._id || m.user)?.toString() === (user?.id || user?._id)?.toString())?.role}
           currentUserId={user?.id || user?._id}
         />
+      ) : activeTab === 'Chat' ? (
+        <ChatTab projectId={project._id} project={project} />
       ) : activeTab === 'Activity' ? (
         <ActivityTab projectId={project._id} />
       ) : (

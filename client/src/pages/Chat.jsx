@@ -25,14 +25,20 @@ export default function Chat() {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     const socket = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
+      auth: { token }
     });
     socketRef.current = socket;
 
-    socket.on("receive_message", (message) => {
-      setMessages((prev) => [...prev, message]);
+    socket.on("new_message", (message) => {
+      setMessages((prev) => {
+        // Prevent duplicate messages
+        if (prev.some((m) => m._id === message._id)) return prev;
+        return [...prev, message];
+      });
     });
 
     socket.on("user_typing", ({ userName }) => {
@@ -67,9 +73,10 @@ export default function Chat() {
     socketRef.current.emit("join_project", projectId);
 
     api
-      .get(`/chat/${projectId}`)
+      .get(`/projects/${projectId}/messages?limit=50&page=1`)
       .then((res) => {
-        setMessages(res.data.messages || []);
+        // Reverse because history is returned newest first
+        setMessages((res.data.messages || []).reverse());
       })
       .catch(() => toast.error("Could not load channel history"));
 
