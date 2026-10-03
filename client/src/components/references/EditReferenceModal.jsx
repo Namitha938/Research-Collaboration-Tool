@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy } from 'lucide-react';
-import { updateReference } from '../../../api/referenceService';
-import { getProjectResearchPapers } from '../../../api/researchPaperService';
+import { updateReference } from '../../api/referenceService';
+import { getProjectResearchPapers } from '../../api/researchPaperService';
 import toast from 'react-hot-toast';
 
 const formatCitationPreview = (data) => {
