@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Filter, AlertTriangle } from 'lucide-react';
+import { Search, Plus, Filter, AlertTriangle, BookMarked } from 'lucide-react';
 import { getReferences, deleteReference } from '../../api/referenceService';
 import ReferenceCard from './ReferenceCard';
 import AddReferenceModal from './AddReferenceModal';
