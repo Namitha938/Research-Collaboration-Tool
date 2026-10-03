@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, 
 import TeamTab from '../../components/team/TeamTab';
 import Tasks from '../Tasks';
 import DocumentsTab from '../../components/documents/DocumentsTab';
+import ResearchPapersTab from '../../components/research-papers/ResearchPapersTab';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -59,7 +60,7 @@ const ProjectDetail = () => {
     { name: 'Resources', icon: <Database size={16} /> },
     { name: 'Team', icon: <Users size={16} /> },
     { name: 'Chat', icon: <MessageSquare size={16} /> },
-    { name: 'References', icon: <BookOpen size={16} /> }
+    { name: 'Research Papers', icon: <BookOpen size={16} /> }
   ];
 
   return (
@@ -145,6 +146,8 @@ const ProjectDetail = () => {
         <Tasks projectId={project._id} />
       ) : activeTab === 'Documents' ? (
         <DocumentsTab projectId={project._id} project={project} />
+      ) : activeTab === 'Research Papers' ? (
+        <ResearchPapersTab projectId={project._id} project={project} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
