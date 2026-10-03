@@ -20,7 +20,7 @@ const PRIORITY_STYLES = {
 };
 
 const COLUMNS = [
-  { id: "todo", title: "To Do", tone: "bg-slate-100 text-slate-700 border-slate-300" },
+  { id: "todo", title: "To Do", tone: "bg-slate-100 text-slate-700 dark:text-slate-300 border-slate-300" },
   { id: "in_progress", title: "In Progress", tone: "bg-amber-100 text-amber-800 border-amber-300" },
   { id: "completed", title: "Completed", tone: "bg-emerald-100 text-emerald-800 border-emerald-300" },
 ];
@@ -131,8 +131,8 @@ export default function Tasks({ projectId }) {
         <div className="flex flex-wrap items-center justify-between gap-4">
         {!projectId && (
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Task Management</h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Task Management</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Track, assign, and manage collaborative research deliverables.
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function Tasks({ projectId }) {
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none focus:border-primary-500"
+                className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm outline-none focus:border-primary-500"
               >
                 <option value="">All Projects</option>
                 {projects.map((p) => (
@@ -156,13 +156,13 @@ export default function Tasks({ projectId }) {
             </div>
           )}
 
-          <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <div className="flex rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1 shadow-sm">
             <button
               onClick={() => setViewMode("kanban")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
                 viewMode === "kanban"
                   ? "bg-primary-50 text-primary-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white"
               }`}
             >
               <Kanban size={15} /> Board
@@ -172,7 +172,7 @@ export default function Tasks({ projectId }) {
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
                 viewMode === "list"
                   ? "bg-primary-50 text-primary-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white"
               }`}
             >
               <List size={15} /> List
@@ -193,14 +193,14 @@ export default function Tasks({ projectId }) {
       {loading ? (
         <div className="py-20 text-center text-slate-400">Loading tasks...</div>
       ) : tasks.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center">
+        <div className="flex flex-col items-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-16 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-600">
             <FolderKanban size={28} />
           </div>
-          <h3 className="mt-4 text-base font-semibold text-slate-900">
+          <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">
             {selectedProject ? "No tasks found" : "Select a project"}
           </h3>
-          <p className="mt-1 max-w-sm text-sm text-slate-500">
+          <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">
             {selectedProject
               ? "There are no tasks associated with this project yet."
               : "Select a project to view its tasks."}
@@ -221,12 +221,12 @@ export default function Tasks({ projectId }) {
             return (
               <div
                 key={col.id}
-                className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50/80 p-4"
+                className="flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 p-4"
               >
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-800">{col.title}</span>
-                    <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-700">
+                    <span className="font-semibold text-slate-800 dark:text-slate-100">{col.title}</span>
+                    <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                       {columnTasks.length}
                     </span>
                   </div>
@@ -240,7 +240,7 @@ export default function Tasks({ projectId }) {
                     return (
                       <div
                         key={t._id}
-                        className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow"
+                        className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm transition hover:shadow"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <span
@@ -261,9 +261,9 @@ export default function Tasks({ projectId }) {
                           )}
                         </div>
 
-                        <h4 className="mt-2.5 font-medium text-slate-900">{t.title}</h4>
+                        <h4 className="mt-2.5 font-medium text-slate-900 dark:text-white">{t.title}</h4>
                         {t.description && (
-                          <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                          <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
                             {t.description}
                           </p>
                         )}
@@ -273,14 +273,14 @@ export default function Tasks({ projectId }) {
                           <span className="truncate">{t.project?.title || "Project"}</span>
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
+                        <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3 text-xs text-slate-500 dark:text-slate-400">
                           <div className="flex items-center gap-1">
                             <User size={13} />
                             {isOwner ? (
                               <select
                                 value={t.assignedTo?._id || ""}
                                 onChange={(e) => handleAssignTask(t._id, e.target.value)}
-                                className="max-w-[100px] truncate rounded border border-slate-200 bg-white px-1 py-0.5 text-xs text-slate-700 outline-none"
+                                className="max-w-[100px] truncate rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-1 py-0.5 text-xs text-slate-700 dark:text-slate-300 outline-none"
                               >
                                 <option value="">Unassigned</option>
                                 {(() => {
@@ -301,7 +301,7 @@ export default function Tasks({ projectId }) {
                             )}
                           </div>
                           {dueStr && (
-                            <div className="flex items-center gap-1 text-slate-500">
+                            <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                               <Calendar size={13} />
                               <span>{dueStr}</span>
                             </div>
@@ -345,9 +345,9 @@ export default function Tasks({ projectId }) {
           })}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+            <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
               <tr>
                 <th className="px-6 py-3.5">Task</th>
                 <th className="px-6 py-3.5">Project</th>
@@ -358,10 +358,10 @@ export default function Tasks({ projectId }) {
                 {isOwner && <th className="px-6 py-3.5 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {tasks.map((t) => (
-                <tr key={t._id} className="hover:bg-slate-50/70">
-                  <td className="px-6 py-4 font-medium text-slate-900">
+                <tr key={t._id} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/70">
+                  <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
                     <div>{t.title}</div>
                     {t.description && (
                       <div className="line-clamp-1 text-xs text-slate-400">
@@ -380,7 +380,7 @@ export default function Tasks({ projectId }) {
                       
                       if (!canChangeStatus) {
                         return (
-                          <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium capitalize text-slate-700">
+                          <span className="rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-2 py-1 text-xs font-medium capitalize text-slate-700 dark:text-slate-300">
                             {t.status.replace("_", " ")}
                           </span>
                         );
@@ -388,7 +388,7 @@ export default function Tasks({ projectId }) {
                       
                       return (
                         <div className="flex items-center gap-2">
-                          <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium capitalize text-slate-700">
+                          <span className="rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-2 py-1 text-xs font-medium capitalize text-slate-700 dark:text-slate-300">
                             {t.status.replace("_", " ")}
                           </span>
                           {t.status === "todo" && (
@@ -420,12 +420,12 @@ export default function Tasks({ projectId }) {
                       {t.priority}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-xs text-slate-600">
+                  <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-400">
                     {isOwner ? (
                       <select
                         value={t.assignedTo?._id || ""}
                         onChange={(e) => handleAssignTask(t._id, e.target.value)}
-                        className="w-full max-w-[150px] rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 outline-none"
+                        className="w-full max-w-[150px] rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-2 py-1 text-xs text-slate-700 dark:text-slate-300 outline-none"
                       >
                         <option value="">Unassigned</option>
                         {(() => {
@@ -445,7 +445,7 @@ export default function Tasks({ projectId }) {
                       <span>{t.assignedTo?.name || "Unassigned"}</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-xs text-slate-500">
+                  <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
                     {t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "—"}
                   </td>
                   {isOwner && (

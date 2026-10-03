@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 
 const field =
-  "w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20";
+  "w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3.5 py-2.5 text-sm outline-none focus:border-primary-500 focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500/20";
 
 export default function UploadDocumentModal({ onClose, onUploaded, defaultProjectId }) {
   const [projects, setProjects] = useState([]);
@@ -74,14 +74,14 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-      <div className="w-full max-w-lg max-h-[95vh] overflow-y-auto space-y-4 rounded-2xl bg-white p-6 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-lg max-h-[95vh] overflow-y-auto space-y-4 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-xl animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">Upload Research Asset</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Upload Research Asset</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-slate-400 hover:text-slate-600 transition"
+            className="text-slate-400 hover:text-slate-600 dark:text-slate-400 transition"
           >
             <X size={20} />
           </button>
@@ -89,12 +89,12 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-500">
+            <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
               File <span className="text-rose-500">*</span>
             </label>
-            <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center hover:border-primary-500 transition">
+            <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 dark:bg-slate-950 p-6 text-center hover:border-primary-500 transition">
               <UploadCloud className="w-8 h-8 text-primary-500 mb-2" />
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 {file ? file.name : "Click or drag file to upload"}
               </p>
               <p className="text-xs text-slate-400 mt-1">PDF, DOCX, CSV up to 10MB</p>
@@ -108,7 +108,7 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-500">
+            <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
               Document Name <span className="text-rose-500">*</span>
             </label>
             <input
@@ -122,7 +122,7 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-500">
+            <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
               Description
             </label>
             <textarea
@@ -136,7 +136,7 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">
+              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
                 Category
               </label>
               <select
@@ -153,7 +153,7 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">
+              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
                 Project <span className="text-rose-500">*</span>
               </label>
               <select
@@ -176,7 +176,7 @@ export default function UploadDocumentModal({ onClose, onUploaded, defaultProjec
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium transition hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950"
             >
               Cancel
             </button>

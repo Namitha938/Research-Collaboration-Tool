@@ -95,7 +95,7 @@ export default function Notifications() {
   if (loading) {
     return (
       <div className="mx-auto max-w-4xl animate-fade-in space-y-6">
-        <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Notifications</h1>
         <div className="flex justify-center p-8">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         </div>
@@ -107,8 +107,8 @@ export default function Notifications() {
     <div className="mx-auto max-w-4xl animate-fade-in space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Notifications</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Platform updates, task assignments, and collaborative activity alerts.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function Notifications() {
         {notifications.some((n) => !n.read) && (
           <button
             onClick={markAllRead}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition-colors"
           >
             <CheckCheck size={15} /> Mark all as read
           </button>
@@ -124,22 +124,22 @@ export default function Notifications() {
       </div>
 
       {notifications.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center shadow-sm">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
             <Bell size={24} />
           </div>
-          <h3 className="mt-4 font-semibold text-slate-900">No notifications yet</h3>
-          <p className="mt-1 text-sm text-slate-500">When you receive notifications, they will show up here.</p>
+          <h3 className="mt-4 font-semibold text-slate-900 dark:text-white">No notifications yet</h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">When you receive notifications, they will show up here.</p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100 shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800 shadow-sm overflow-hidden">
           {notifications.map((n) => (
             <Link
               key={n._id}
               to={getLinkForNotification(n)}
               onClick={() => markAsRead(n._id, n.read)}
-              className={`flex items-start gap-4 p-5 transition-colors hover:bg-slate-50 ${
-                n.read ? "bg-white" : "bg-primary-50/30"
+              className={`flex items-start gap-4 p-5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 ${
+                n.read ? "bg-white dark:bg-slate-900" : "bg-primary-50/30"
               }`}
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
@@ -147,7 +147,7 @@ export default function Notifications() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-slate-900 text-sm">{n.title}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-white text-sm">{n.title}</h3>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-slate-400">
                       {new Date(n.createdAt).toLocaleDateString()} {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -160,7 +160,7 @@ export default function Notifications() {
                     </button>
                   </div>
                 </div>
-                <p className="mt-1 text-sm text-slate-600">{n.message}</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{n.message}</p>
               </div>
               {!n.read && (
                 <span className="h-2 w-2 rounded-full bg-primary-600 shrink-0 mt-2" />

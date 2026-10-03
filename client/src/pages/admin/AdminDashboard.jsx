@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         
         <div className="p-4 flex-1 space-y-6 overflow-y-auto">
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-3">Main Navigation</div>
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-3">Main Navigation</div>
             <nav className="space-y-1.5">
               <Link to="/admin/dashboard" className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md shadow-indigo-600/20">
                 <LayoutDashboard size={18} /> Overview
@@ -110,11 +110,11 @@ const AdminDashboard = () => {
           </div>
 
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-3">Security & Compliance</div>
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-3">Security & Compliance</div>
             <nav className="space-y-1.5">
               <button onClick={exportAuditLog} className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all font-medium text-left">
                 <span className="flex items-center gap-3"><FileText size={18} className="text-emerald-400" /> Export Audit CSV</span>
-                <Download size={14} className="text-slate-500" />
+                <Download size={14} className="text-slate-500 dark:text-slate-400" />
               </button>
               <Link to="/settings" className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all font-medium">
                 <Settings size={18} /> Platform Config

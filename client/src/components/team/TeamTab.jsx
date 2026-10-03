@@ -72,15 +72,15 @@ export default function TeamTab({ project }) {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Loading team...</div>;
+  if (loading) return <div className="p-8 text-center text-slate-500 dark:text-slate-400">Loading team...</div>;
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Team Members</h2>
-            <p className="text-sm text-slate-500">Manage researchers and collaborators working on this project.</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Team Members</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Manage researchers and collaborators working on this project.</p>
           </div>
           {isOwner && (
             <button onClick={() => setShowInviteModal(true)} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 shadow-sm flex items-center gap-2">
@@ -91,39 +91,39 @@ export default function TeamTab({ project }) {
         
         {members.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center">
-            <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+            <div className="w-12 h-12 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mb-3">
               <Users size={20} className="text-slate-400" />
             </div>
-            <h3 className="text-base font-semibold text-slate-900 mb-1">No team members yet</h3>
-            <p className="text-sm text-slate-500 max-w-sm">Invite researchers and collaborators to work together on this project.</p>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">No team members yet</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">Invite researchers and collaborators to work together on this project.</p>
           </div>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {members.map((m) => {
               const u = m.user;
               if (!u) return null;
               return (
-                <li key={u._id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                <li key={u._id} className="p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold">
                       {u.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-900">{u.name}</p>
-                      <p className="text-sm text-slate-500">{u.email}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">{u.name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{u.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end">
-                      <span className="text-sm font-medium text-slate-700 capitalize">{m.role}</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">{m.role}</span>
                       <span className="text-xs text-slate-400">Joined {new Date(m.joinedAt).toLocaleDateString()}</span>
                     </div>
                     {isOwner && m.role !== 'owner' && (
-                      <div className="flex items-center gap-2 border-l border-slate-200 pl-6">
+                      <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-6">
                         <select
                           value={m.role}
                           onChange={(e) => handleChangeRole(u._id, e.target.value)}
-                          className="text-sm border-slate-200 rounded-md py-1 px-2 text-slate-600 outline-none focus:ring-1 focus:ring-primary-500"
+                          className="text-sm border-slate-200 dark:border-slate-800 rounded-md py-1 px-2 text-slate-600 dark:text-slate-400 outline-none focus:ring-1 focus:ring-primary-500"
                         >
                           <option value="researcher">Researcher</option>
                           <option value="viewer">Viewer</option>
@@ -142,11 +142,11 @@ export default function TeamTab({ project }) {
       </div>
 
       {isOwner && invitations.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-200">
-            <h2 className="text-lg font-bold text-slate-900">Pending Invitations</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-slate-200 dark:border-slate-800">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Pending Invitations</h2>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {invitations.map((inv) => (
               <li key={inv._id} className="p-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -154,8 +154,8 @@ export default function TeamTab({ project }) {
                     <Clock size={18} />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">{inv.email}</p>
-                    <p className="text-sm text-slate-500 capitalize">Role: {inv.role}</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{inv.email}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 capitalize">Role: {inv.role}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">

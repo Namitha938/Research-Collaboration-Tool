@@ -50,28 +50,28 @@ const Login = () => {
       title="Welcome back."
       subtitle="Continue your research journey and connect with your team."
     >
-      <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/40">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none transition-colors duration-300">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Sign In</h1>
-          <p className="text-sm text-slate-500 mt-1">Enter your details to access your workspace</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Sign In</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Enter your details to access your workspace</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
             <input 
               type="email" 
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors bg-slate-50 focus:bg-white"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 transition-colors bg-slate-50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 text-slate-900 dark:text-white"
               placeholder="name@university.edu"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
             <div className="relative">
               <input 
                 type={showPassword ? "text" : "password"} 
@@ -79,12 +79,12 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors bg-slate-50 focus:bg-white pr-10"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 transition-colors bg-slate-50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 text-slate-900 dark:text-white pr-10"
                 placeholder="••••••••"
               />
               <button 
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -94,10 +94,10 @@ const Login = () => {
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500" />
-              <span className="text-sm text-slate-600">Remember me</span>
+              <input type="checkbox" className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:bg-slate-800" />
+              <span className="text-sm text-slate-600 dark:text-slate-400">Remember me</span>
             </label>
-            <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+            <a href="#" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
               Forgot password?
             </a>
           </div>
@@ -111,14 +111,14 @@ const Login = () => {
           </Button>
 
           <div className="relative flex items-center py-2">
-            <div className="flex-grow border-t border-slate-200"></div>
-            <span className="flex-shrink-0 mx-4 text-slate-400 text-sm">or</span>
-            <div className="flex-grow border-t border-slate-200"></div>
+            <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            <span className="flex-shrink-0 mx-4 text-slate-400 dark:text-slate-500 dark:text-slate-400 text-sm">or</span>
+            <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
           </div>
 
           <button 
             type="button"
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200 transition-colors font-medium text-sm shadow-sm"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 transition-colors font-medium text-sm shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -130,9 +130,9 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-slate-600">
+        <p className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
           Don't have an account?{' '}
-          <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
+          <Link to="/register" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
             Sign up
           </Link>
         </p>
