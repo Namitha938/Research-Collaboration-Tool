@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const { createActivity } = require("../utils/createActivity");
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -21,6 +22,15 @@ const createProject = async (req, res) => {
       deadline,
       status: "active",
       progress: 0,
+    });
+
+    await createActivity({
+      actor: req.user._id,
+      project: project._id,
+      type: 'PROJECT_CREATED',
+      entityType: 'project',
+      entityId: project._id,
+      message: `created the project "${title}"`
     });
 
     res.status(201).json({ success: true, project });
@@ -98,6 +108,15 @@ const updateProject = async (req, res) => {
     })
       .populate("owner", "name email")
       .populate("members.user", "name email");
+
+    await createActivity({
+      actor: req.user._id,
+      project: project._id,
+      type: 'PROJECT_UPDATED',
+      entityType: 'project',
+      entityId: project._id,
+      message: `updated project details`
+    });
 
     res.json({ success: true, project: updatedProject });
   } catch (error) {

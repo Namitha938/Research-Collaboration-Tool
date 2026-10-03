@@ -4,6 +4,7 @@ const Invitation = require("../models/Invitation");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 const createNotification = require("../utils/createNotification");
+const { createActivity } = require("../utils/createActivity");
 
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
@@ -103,6 +104,15 @@ const sendInvitation = async (req, res) => {
       });
     }
 
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'MEMBER_INVITED',
+      entityType: 'user',
+      entityId: existingUser ? existingUser._id : null,
+      message: `invited ${lowerEmail} as ${role}`
+    });
+
     res.status(201).json({ success: true, message: "Invitation sent successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -190,6 +200,15 @@ const removeProjectMember = async (req, res) => {
       project: project._id
     });
 
+    await createActivity({
+      actor: req.user._id,
+      project: project._id,
+      type: 'MEMBER_REMOVED',
+      entityType: 'user',
+      entityId: req.params.userId,
+      message: `removed a member from the project`
+    });
+
     res.json({ success: true, message: "Member removed" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -228,6 +247,15 @@ const changeMemberRole = async (req, res) => {
       title: "Project role updated",
       message: `Your role in "${project.title}" was changed to ${role}.`,
       project: project._id
+    });
+
+    await createActivity({
+      actor: req.user._id,
+      project: project._id,
+      type: 'MEMBER_ROLE_CHANGED',
+      entityType: 'user',
+      entityId: req.params.userId,
+      message: `changed a member's role to ${role}`
     });
 
     res.json({ success: true, message: "Role updated" });
@@ -290,6 +318,15 @@ const acceptInvitation = async (req, res) => {
       message: `${req.user.name} accepted your invitation to join "${project.title}".`,
       project: project._id,
       invitation: invitation._id
+    });
+
+    await createActivity({
+      actor: req.user._id,
+      project: project._id,
+      type: 'MEMBER_JOINED',
+      entityType: 'user',
+      entityId: req.user._id,
+      message: `joined the project as ${invitation.role}`
     });
 
     res.json({ success: true, message: "Invitation accepted", projectId: project._id, projectName: project.title });

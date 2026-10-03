@@ -3,6 +3,7 @@ const Project = require("../models/Project");
 const User = require("../models/User");
 const mongoose = require("mongoose");
 const createNotification = require("../utils/createNotification");
+const { createActivity } = require("../utils/createActivity");
 
 // Helper to check project membership and get role
 const checkProjectMembership = async (projectId, userId) => {
@@ -79,6 +80,26 @@ const createTask = async (req, res) => {
         message: `${req.user.name} assigned you the task "${title}".`,
         project: projectId,
         task: task._id
+      });
+    }
+
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'TASK_CREATED',
+      entityType: 'task',
+      entityId: task._id,
+      message: `created task "${title}"`
+    });
+
+    if (assignedTo) {
+      await createActivity({
+        actor: req.user._id,
+        project: projectId,
+        type: 'TASK_ASSIGNED',
+        entityType: 'task',
+        entityId: task._id,
+        message: `assigned task "${title}" to a team member`
       });
     }
 
@@ -204,6 +225,17 @@ const updateTask = async (req, res) => {
       .populate("assignedTo", "name email")
       .populate("createdBy", "name email");
 
+    if (assignedTo && assignedTo !== oldAssignedTo) {
+      await createActivity({
+        actor: req.user._id,
+        project: task.project,
+        type: oldAssignedTo ? 'TASK_REASSIGNED' : 'TASK_ASSIGNED',
+        entityType: 'task',
+        entityId: task._id,
+        message: oldAssignedTo ? `reassigned task "${task.title}"` : `assigned task "${task.title}"`
+      });
+    }
+
     res.json({ success: true, message: "Task updated successfully", task: populatedTask });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -261,6 +293,17 @@ const updateTaskStatus = async (req, res) => {
       .populate("assignedTo", "name email")
       .populate("createdBy", "name email");
 
+    if (status === "completed" && current !== "completed") {
+      await createActivity({
+        actor: req.user._id,
+        project: task.project,
+        type: 'TASK_COMPLETED',
+        entityType: 'task',
+        entityId: task._id,
+        message: `completed task "${task.title}"`
+      });
+    }
+
     res.json({ success: true, message: "Task status updated", task: populatedTask });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -313,6 +356,19 @@ const assignTask = async (req, res) => {
     const populatedTask = await Task.findById(task._id)
       .populate("assignedTo", "name email")
       .populate("createdBy", "name email");
+
+    if (assignedTo !== oldAssignedTo) {
+      if (assignedTo) {
+        await createActivity({
+          actor: req.user._id,
+          project: task.project,
+          type: oldAssignedTo ? 'TASK_REASSIGNED' : 'TASK_ASSIGNED',
+          entityType: 'task',
+          entityId: task._id,
+          message: oldAssignedTo ? `reassigned task "${task.title}"` : `assigned task "${task.title}"`
+        });
+      }
+    }
 
     res.json({ success: true, message: "Task assigned", task: populatedTask });
   } catch (error) {

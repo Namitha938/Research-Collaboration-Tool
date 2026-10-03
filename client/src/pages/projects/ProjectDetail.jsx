@@ -9,6 +9,7 @@ import DocumentsTab from '../../components/documents/DocumentsTab';
 import ResearchPapersTab from '../../components/research-papers/ResearchPapersTab';
 import ReferencesTab from '../../components/references/ReferencesTab';
 import MilestonesTab from '../../components/milestones/MilestonesTab';
+import ActivityTab from '../../components/activity/ActivityTab';
 import { useAuth } from '../../context/AuthContext';
 
 const ProjectDetail = () => {
@@ -16,7 +17,7 @@ const ProjectDetail = () => {
   const { user } = useAuth();
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('Activity');
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -58,7 +59,7 @@ const ProjectDetail = () => {
   }
 
   const tabs = [
-    { name: 'Overview', icon: <Activity size={16} /> },
+    { name: 'Activity', icon: <Activity size={16} /> },
     { name: 'Tasks', icon: <CheckSquare size={16} /> },
     { name: 'Documents', icon: <FileText size={16} /> },
     { name: 'Resources', icon: <Database size={16} /> },
@@ -166,6 +167,8 @@ const ProjectDetail = () => {
           currentUserRole={project.members?.find(m => (m.user?._id || m.user)?.toString() === (user?.id || user?._id)?.toString())?.role}
           currentUserId={user?.id || user?._id}
         />
+      ) : activeTab === 'Activity' ? (
+        <ActivityTab projectId={project._id} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">

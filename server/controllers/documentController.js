@@ -2,6 +2,7 @@ const Document = require("../models/Document");
 const Project = require("../models/Project");
 const cloudinary = require("../config/cloudinary");
 const { streamifier } = require("stream");
+const { createActivity } = require("../utils/createActivity");
 
 // Helper to check project membership
 const checkProjectMembership = async (projectId, userId) => {
@@ -83,6 +84,15 @@ const uploadDocument = async (req, res) => {
     }
 
     const populatedDoc = await Document.findById(document._id).populate("uploadedBy", "name email");
+
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'DOCUMENT_UPLOADED',
+      entityType: 'document',
+      entityId: document._id,
+      message: `uploaded document "${document.name}"`
+    });
 
     res.status(201).json({ success: true, message: "Document uploaded successfully", document: populatedDoc });
   } catch (error) {
@@ -255,6 +265,15 @@ const deleteDocument = async (req, res) => {
     }
 
     await document.deleteOne();
+
+    await createActivity({
+      actor: req.user._id,
+      project: document.project,
+      type: 'DOCUMENT_DELETED',
+      entityType: 'document',
+      entityId: document._id,
+      message: `deleted document "${document.name}"`
+    });
 
     res.json({ success: true, message: "Document deleted successfully" });
   } catch (error) {
