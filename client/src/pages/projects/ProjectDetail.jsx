@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProjectById } from '../../api/projectService';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, Database, BookOpen, MessageSquare, BookMarked } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Activity, Settings, CheckSquare, FileText, Database, BookOpen, MessageSquare, BookMarked, Target } from 'lucide-react';
 import TeamTab from '../../components/team/TeamTab';
 import Tasks from '../Tasks';
 import DocumentsTab from '../../components/documents/DocumentsTab';
 import ResearchPapersTab from '../../components/research-papers/ResearchPapersTab';
 import ReferencesTab from '../../components/references/ReferencesTab';
+import MilestonesTab from '../../components/milestones/MilestonesTab';
 import { useAuth } from '../../context/AuthContext';
 
 const ProjectDetail = () => {
@@ -64,7 +65,8 @@ const ProjectDetail = () => {
     { name: 'Team', icon: <Users size={16} /> },
     { name: 'Chat', icon: <MessageSquare size={16} /> },
     { name: 'Research Papers', icon: <BookOpen size={16} /> },
-    { name: 'References', icon: <BookMarked size={16} /> }
+    { name: 'References', icon: <BookMarked size={16} /> },
+    { name: 'Milestones', icon: <Target size={16} /> }
   ];
 
   return (
@@ -154,6 +156,12 @@ const ProjectDetail = () => {
         <ResearchPapersTab projectId={project._id} project={project} />
       ) : activeTab === 'References' ? (
         <ReferencesTab 
+          project={project} 
+          currentUserRole={project.members?.find(m => (m.user?._id || m.user)?.toString() === (user?.id || user?._id)?.toString())?.role}
+          currentUserId={user?.id || user?._id}
+        />
+      ) : activeTab === 'Milestones' ? (
+        <MilestonesTab 
           project={project} 
           currentUserRole={project.members?.find(m => (m.user?._id || m.user)?.toString() === (user?.id || user?._id)?.toString())?.role}
           currentUserId={user?.id || user?._id}

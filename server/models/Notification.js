@@ -19,6 +19,9 @@ const notificationSchema = new mongoose.Schema(
         "task_assigned",
         "task_reassigned",
         "task_completed",
+        "milestone_assigned",
+        "milestone_reassigned",
+        "milestone_completed",
       ],
       required: true,
     },
@@ -39,6 +42,10 @@ const notificationSchema = new mongoose.Schema(
     task: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Task",
+    },
+    milestone: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Milestone",
     },
     invitation: {
       type: mongoose.Schema.Types.ObjectId,
