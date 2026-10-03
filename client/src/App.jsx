@@ -19,6 +19,7 @@ import InvitationPage from "./pages/projects/InvitationPage";
 import Tasks from "./pages/Tasks";
 import Documents from "./pages/Documents";
 import Resources from "./pages/Resources";
+import ResearchPapers from "./pages/ResearchPapers";
 import Team from "./pages/Team";
 import Chat from "./pages/Chat";
 import Notifications from "./pages/Notifications";
@@ -64,7 +65,7 @@ export default function App() {
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/documents" element={<Documents />} />
               <Route path="/resources" element={<Resources />} />
-              <Route path="/papers" element={<Documents defaultCategory="paper" />} />
+              <Route path="/papers" element={<ResearchPapers />} />
               <Route path="/team" element={<Team />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/notifications" element={<Notifications />} />
