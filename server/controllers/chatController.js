@@ -1,39 +1,43 @@
-const Message = require("../models/Message");
-const Project = require("../models/Project");
+const Message = require('../models/Message');
+const Project = require('../models/Project');
 
-// @desc    Get message history for a project
-// @route   GET /api/chat/:projectId
-// @access  Private
-const getProjectMessages = async (req, res) => {
+const checkProjectMembership = async (projectId, userId) => {
+  const project = await Project.findById(projectId);
+  if (!project) return { project: null, role: null };
+
+  const isOwner = project.owner.toString() === userId.toString();
+  const member = project.members.find((m) => m.user?.toString() === userId.toString());
+
+  if (isOwner) return { project, role: "owner" };
+  if (member) return { project, role: member.role };
+  return { project, role: null };
+};
+
+exports.getProjectMessages = async (req, res) => {
   try {
     const { projectId } = req.params;
+    const { limit = 50, page = 1 } = req.query;
 
-    const project = await Project.findById(projectId);
+    const { project, role } = await checkProjectMembership(projectId, req.user._id);
     if (!project) {
-      return res.status(404).json({ success: false, message: "Project not found" });
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+    if (!role) {
+      return res.status(403).json({ success: false, message: 'Not authorized to access this project chat' });
     }
 
-    const isMember =
-      project.owner.toString() === req.user._id.toString() ||
-      project.members.some((m) => m.toString() === req.user._id.toString());
+    const skip = (page - 1) * limit;
 
-    if (!isMember) {
-      return res.status(403).json({ success: false, message: "Not authorized to access this project chat" });
-    }
-
+    // Fetch newest messages first (createdAt descending), then we can reverse them on frontend or backend
     const messages = await Message.find({ project: projectId })
-      .populate("sender", "name email")
-      .sort({ createdAt: 1 })
-      .limit(100);
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('sender', 'name email');
 
     res.json({ success: true, messages });
   } catch (error) {
-    console.error("Get messages error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ success: false, message: 'Server error fetching messages' });
   }
 };
-
-module.exports = {
-  getProjectMessages,
-};
-

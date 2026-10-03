@@ -20,6 +20,7 @@ const io = new Server(server, {
   cors: { origin: process.env.CLIENT_URL, credentials: true },
 });
 app.set("io", io);
+require('./sockets/chat')(io);
 
 // Global middleware
 app.use(helmet());
@@ -52,7 +53,7 @@ app.get("/api/test-email", async (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/invitations", require("./routes/invitationRoutes"));
-app.use("/api/chat", require("./routes/chatRoutes"));
+app.use("/api/projects/:projectId/messages", require("./routes/chatRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api", require("./routes/documentRoutes"));
 app.use("/api", require("./routes/taskRoutes"));
