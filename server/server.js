@@ -58,6 +58,7 @@ app.use("/api", require("./routes/documentRoutes"));
 app.use("/api", require("./routes/taskRoutes"));
 app.use("/api", require("./routes/resourceRoutes"));
 app.use("/api", require("./routes/researchPaperRoutes"));
+app.use("/api", require("./routes/referenceRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);
