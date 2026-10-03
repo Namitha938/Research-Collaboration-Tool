@@ -1,6 +1,7 @@
 const ResearchPaper = require("../models/ResearchPaper");
 const Project = require("../models/Project");
 const cloudinary = require("../config/cloudinary");
+const { createActivity } = require("../utils/createActivity");
 
 // Helper to check project membership
 const checkProjectMembership = async (projectId, userId) => {
@@ -112,6 +113,15 @@ const createResearchPaper = async (req, res) => {
     }
 
     const populatedPaper = await ResearchPaper.findById(paper._id).populate("addedBy", "name email");
+
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'RESEARCH_PAPER_ADDED',
+      entityType: 'researchPaper',
+      entityId: paper._id,
+      message: `added research paper "${paper.title}"`
+    });
 
     res.status(201).json({ success: true, message: "Research paper added successfully", paper: populatedPaper });
   } catch (error) {
@@ -271,6 +281,15 @@ const deleteResearchPaper = async (req, res) => {
     }
 
     await ResearchPaper.findByIdAndDelete(paperId);
+
+    await createActivity({
+      actor: req.user._id,
+      project: paper.project,
+      type: 'RESEARCH_PAPER_DELETED',
+      entityType: 'researchPaper',
+      entityId: paper._id,
+      message: `deleted research paper "${paper.title}"`
+    });
 
     res.json({ success: true, message: "Research paper deleted successfully" });
   } catch (error) {

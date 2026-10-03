@@ -60,6 +60,7 @@ app.use("/api", require("./routes/resourceRoutes"));
 app.use("/api", require("./routes/researchPaperRoutes"));
 app.use("/api", require("./routes/milestoneRoutes"));
 app.use("/api", require("./routes/referenceRoutes"));
+app.use("/api/projects/:projectId/activities", require("./routes/activityRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);

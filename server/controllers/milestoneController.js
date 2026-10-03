@@ -1,6 +1,7 @@
 const Milestone = require('../models/Milestone');
 const Project = require('../models/Project');
 const Notification = require('../models/Notification'); // For Milestone notifications
+const { createActivity } = require("../utils/createActivity");
 
 // Helper to verify project access
 const verifyProjectAccess = async (projectId, userId) => {
@@ -118,6 +119,15 @@ exports.createMilestone = async (req, res) => {
         message: `You have been assigned to milestone: ${title}`
       });
     }
+
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'MILESTONE_CREATED',
+      entityType: 'milestone',
+      entityId: milestone._id,
+      message: `created milestone "${milestone.title}"`
+    });
 
     res.status(201).json({ milestone });
   } catch (error) {
@@ -264,6 +274,17 @@ exports.updateMilestone = async (req, res) => {
          milestone: milestone._id,
          title: 'Milestone Completed',
          message: `Milestone "${milestone.title}" was completed by a team member.`
+       });
+    }
+
+    if (milestone.status === 'completed' && req.body.status) {
+       await createActivity({
+         actor: req.user._id,
+         project: milestone.project,
+         type: 'MILESTONE_COMPLETED',
+         entityType: 'milestone',
+         entityId: milestone._id,
+         message: `completed milestone "${milestone.title}"`
        });
     }
 

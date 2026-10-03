@@ -2,6 +2,7 @@ const Reference = require('../models/Reference');
 const Project = require('../models/Project');
 const ResearchPaper = require('../models/ResearchPaper');
 const { formatCitation } = require('../utils/citationFormatter');
+const { createActivity } = require("../utils/createActivity");
 
 // Utility to verify project access
 const verifyProjectAccess = async (projectId, userId) => {
@@ -99,6 +100,15 @@ exports.createReference = async (req, res) => {
       await reference.populate('researchPaper', 'title');
     }
     await reference.populate('addedBy', 'name email');
+
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'REFERENCE_ADDED',
+      entityType: 'reference',
+      entityId: reference._id,
+      message: `added reference "${reference.title}"`
+    });
 
     res.status(201).json({ success: true, reference });
   } catch (error) {

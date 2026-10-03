@@ -1,6 +1,7 @@
 const Resource = require("../models/Resource");
 const Project = require("../models/Project");
 const cloudinary = require("../config/cloudinary");
+const { createActivity } = require("../utils/createActivity");
 
 // Helper to check project membership
 const checkProjectMembership = async (projectId, userId) => {
@@ -112,6 +113,15 @@ const createResource = async (req, res) => {
     }
 
     const populatedResource = await Resource.findById(resource._id).populate("createdBy", "name email");
+
+    await createActivity({
+      actor: req.user._id,
+      project: projectId,
+      type: 'RESOURCE_ADDED',
+      entityType: 'resource',
+      entityId: resource._id,
+      message: `added resource "${resource.name}"`
+    });
 
     res.status(201).json({ success: true, message: "Resource created successfully", resource: populatedResource });
   } catch (error) {
@@ -239,6 +249,15 @@ const deleteResource = async (req, res) => {
     }
 
     await resource.deleteOne();
+
+    await createActivity({
+      actor: req.user._id,
+      project: resource.project,
+      type: 'RESOURCE_DELETED',
+      entityType: 'resource',
+      entityId: resource._id,
+      message: `deleted resource "${resource.name}"`
+    });
 
     res.json({ success: true, message: "Resource deleted successfully" });
   } catch (error) {
