@@ -66,7 +66,7 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white dark:text-slate-100 selection:bg-primary-100 dark:selection:bg-indigo-500 selection:text-primary-900 dark:selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 selection:bg-primary-100 selection:text-primary-900">
       <Navbar />
 
       {/* Hero Section */}
@@ -74,14 +74,14 @@ const Landing = () => {
         
         {/* Abstract shapes */}
         <div className="absolute top-0 right-0 -z-10 translate-x-1/3 -translate-y-1/4">
-          <div className="w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary-100 dark:from-indigo-600/30 to-blue-50 dark:to-purple-600/20 blur-[100px] opacity-70"></div>
+          <div className="w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary-100 to-blue-50 blur-[100px] opacity-70"></div>
         </div>
         <div className="absolute bottom-0 left-0 -z-10 -translate-x-1/3 translate-y-1/4">
-          <div className="w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-purple-100 dark:from-purple-600/25 to-primary-50 dark:to-pink-500/20 blur-[100px] opacity-60"></div>
+          <div className="w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-purple-100 to-primary-50 blur-[100px] opacity-60"></div>
         </div>
 
         <div className="text-center max-w-4xl mx-auto relative z-10 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 mb-8 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-600 dark:text-slate-400 mb-8 shadow-sm">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
@@ -91,7 +91,7 @@ const Landing = () => {
           
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.1]">
             Collaborate. Research. <br className="hidden md:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 dark:from-indigo-400 to-blue-600 dark:to-pink-400">Discover.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-600">Discover.</span>
           </h1>
           
           <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -99,11 +99,11 @@ const Landing = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/register" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:border-0">Start Researching</Button>
+            <Link to="/register">
+              <Button size="lg" className="w-full sm:w-auto">Start Researching</Button>
             </Link>
-            <a href="#features" className="w-full sm:w-auto">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700">Explore Features</Button>
+            <a href="#features">
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto">Explore Features</Button>
             </a>
           </div>
         </div>
@@ -117,7 +117,7 @@ const Landing = () => {
       <StatsSection />
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-slate-50 dark:bg-slate-950 dark:bg-slate-900 transition-colors duration-300">
+      <section id="features" className="py-24 bg-slate-50 dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading 
             title="Everything your research team needs" 
@@ -138,7 +138,7 @@ const Landing = () => {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-24 bg-white dark:bg-slate-900 dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800 transition-colors duration-300">
+      <section id="how-it-works" className="py-24 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             
@@ -174,11 +174,11 @@ const Landing = () => {
             </div>
 
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary-100 dark:from-indigo-900/30 to-blue-50 dark:to-purple-900/30 rounded-3xl transform rotate-3 scale-105 -z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary-100 to-blue-50 rounded-3xl transform rotate-3 scale-105 -z-10"></div>
               <img 
                 src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
                 alt="Research team collaborating" 
-                className="rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800/50 dark:border-slate-800 object-cover w-full aspect-[4/3]"
+                className="rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800/50 object-cover w-full aspect-[4/3]"
               />
             </div>
             

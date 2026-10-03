@@ -64,38 +64,38 @@ const AdminLogin = () => {
       subtitle="Authorized personnel sign in to manage institutional metrics, researchers, and system security."
       illustration={adminIllustration}
     >
-      <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-md">
               <ShieldCheck size={22} className="text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Admin Portal Login</h1>
-              <p className="text-xs text-slate-500">System Administrator Credentials</p>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white">Admin Portal Login</h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400">System Administrator Credentials</p>
             </div>
           </div>
-          <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1">
+          <Link to="/login" className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-100 flex items-center gap-1">
             <ArrowLeft size={12} /> User Portal
           </Link>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Admin Email</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Admin Email</label>
             <input 
               type="email" 
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-colors bg-slate-50 focus:bg-white text-sm"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-colors bg-slate-50 dark:bg-slate-950 focus:bg-white dark:bg-slate-900 text-sm"
               placeholder="admin@researchhub.edu"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Password</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Password</label>
             <div className="relative">
               <input 
                 type={showPassword ? "text" : "password"} 
@@ -103,12 +103,12 @@ const AdminLogin = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-colors bg-slate-50 focus:bg-white pr-10 text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-colors bg-slate-50 dark:bg-slate-950 focus:bg-white dark:bg-slate-900 pr-10 text-sm"
                 placeholder="••••••••"
               />
               <button 
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-400 focus:outline-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

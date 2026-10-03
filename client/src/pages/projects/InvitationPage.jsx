@@ -46,7 +46,7 @@ export default function InvitationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
         <div className="animate-pulse flex flex-col items-center">
           <div className="w-16 h-16 bg-slate-200 rounded-full mb-4"></div>
           <div className="h-6 w-48 bg-slate-200 rounded"></div>
@@ -57,13 +57,13 @@ export default function InvitationPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 text-center">
           <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <XCircle size={32} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Invalid Invitation</h2>
-          <p className="text-slate-500 mb-6">{error}</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Invalid Invitation</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-6">{error}</p>
           <Link to="/" className="inline-block rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
             Go to Homepage
           </Link>
@@ -73,37 +73,37 @@ export default function InvitationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-        <div className="p-8 text-center border-b border-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div className="p-8 text-center border-b border-slate-100 dark:border-slate-800">
           <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Mail size={32} />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">You're Invited!</h1>
-          <p className="text-slate-500">
-            <span className="font-semibold text-slate-700">{invitation.invitedBy?.name}</span> has invited you to collaborate on <span className="font-semibold text-slate-700">{invitation.project?.title}</span>.
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">You're Invited!</h1>
+          <p className="text-slate-500 dark:text-slate-400">
+            <span className="font-semibold text-slate-700 dark:text-slate-300">{invitation.invitedBy?.name}</span> has invited you to collaborate on <span className="font-semibold text-slate-700 dark:text-slate-300">{invitation.project?.title}</span>.
           </p>
         </div>
         
-        <div className="p-8 bg-slate-50/50">
+        <div className="p-8 bg-slate-50 dark:bg-slate-950/50">
           <div className="space-y-4 mb-8 text-sm">
-            <div className="flex justify-between py-2 border-b border-slate-200">
-              <span className="text-slate-500">Sent to</span>
-              <span className="font-medium text-slate-900">{invitation.email}</span>
+            <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-slate-500 dark:text-slate-400">Sent to</span>
+              <span className="font-medium text-slate-900 dark:text-white">{invitation.email}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-200">
-              <span className="text-slate-500">Role</span>
-              <span className="font-medium text-slate-900 capitalize">{invitation.role}</span>
+            <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-slate-500 dark:text-slate-400">Role</span>
+              <span className="font-medium text-slate-900 dark:text-white capitalize">{invitation.role}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-200">
-              <span className="text-slate-500">Status</span>
-              <span className="font-medium text-slate-900 capitalize">{invitation.status}</span>
+            <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-slate-500 dark:text-slate-400">Status</span>
+              <span className="font-medium text-slate-900 dark:text-white capitalize">{invitation.status}</span>
             </div>
           </div>
 
           {!user ? (
             <div className="text-center">
-              <p className="text-sm text-slate-600 mb-4">You need to sign in to accept this invitation.</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">You need to sign in to accept this invitation.</p>
               <div className="flex flex-col gap-3">
                 <button 
                   onClick={() => navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`)}
@@ -113,7 +113,7 @@ export default function InvitationPage() {
                 </button>
                 <button 
                   onClick={() => navigate(`/register?email=${encodeURIComponent(invitation.email)}&redirect=${encodeURIComponent(location.pathname)}`)}
-                  className="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition-colors"
                 >
                   Create Account
                 </button>
@@ -128,7 +128,7 @@ export default function InvitationPage() {
               </button>
             </div>
           ) : invitation.status !== 'pending' ? (
-            <div className="text-center p-4 bg-slate-100 rounded-xl text-slate-600 text-sm">
+            <div className="text-center p-4 bg-slate-100 rounded-xl text-slate-600 dark:text-slate-400 text-sm">
               This invitation is already {invitation.status}.
             </div>
           ) : (

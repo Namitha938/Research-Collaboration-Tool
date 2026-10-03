@@ -126,8 +126,8 @@ export default function Chat() {
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 shadow-sm">
           <MessageSquare size={28} />
         </div>
-        <h2 className="mt-4 text-xl font-bold text-slate-900">No project channels</h2>
-        <p className="mt-1.5 text-sm text-slate-500">
+        <h2 className="mt-4 text-xl font-bold text-slate-900 dark:text-white">No project channels</h2>
+        <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
           Join or create a research workspace to enable real-time team messaging.
         </p>
       </div>
@@ -136,15 +136,15 @@ export default function Chat() {
 
   return (
     <div className="mx-auto max-w-[1400px] animate-fade-in">
-      <div className="h-[calc(100vh-160px)] min-h-[550px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row">
+      <div className="h-[calc(100vh-160px)] min-h-[550px] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col md:flex-row">
         {/* Project Channels Sidebar */}
-        <aside className="w-full border-b border-slate-200 bg-slate-50/70 p-4 md:w-80 md:border-b-0 md:border-r flex flex-col">
-          <div className="mb-3 flex items-center justify-between px-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <aside className="w-full border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/70 p-4 md:w-80 md:border-b-0 md:border-r flex flex-col">
+          <div className="mb-3 flex items-center justify-between px-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <FolderKanban size={16} className="text-indigo-600" />
               <span>Research Rooms</span>
             </div>
-            <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+            <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
               {projects.length}
             </span>
           </div>
@@ -159,7 +159,7 @@ export default function Chat() {
                   className={`flex w-full items-center justify-between rounded-xl px-3.5 py-3 text-left transition-all ${
                     isSelected
                       ? "bg-indigo-600 text-white font-semibold shadow-xs"
-                      : "text-slate-700 hover:bg-slate-200/60"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-200/60"
                   }`}
                 >
                   <div className="truncate pr-2">
@@ -176,7 +176,7 @@ export default function Chat() {
                     className={`shrink-0 text-[11px] px-2 py-0.5 rounded-full ${
                       isSelected
                         ? "bg-indigo-500/80 text-white"
-                        : "bg-slate-200 text-slate-600"
+                        : "bg-slate-200 text-slate-600 dark:text-slate-400"
                     }`}
                   >
                     {p.members?.length || 1}
@@ -188,25 +188,25 @@ export default function Chat() {
         </aside>
 
         {/* Chat Workspace */}
-        <main className="flex flex-1 flex-col bg-white">
+        <main className="flex flex-1 flex-col bg-white dark:bg-slate-900">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50/40">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4 bg-slate-50 dark:bg-slate-950/40">
             <div>
-              <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+              <h2 className="font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
                 <span>#{activeProject?.title}</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {activeProject?.description || activeProject?.researchArea}
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
+            <div className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
               <Users size={14} className="text-indigo-600" />
               <span>{activeProject?.members?.length || 1} Members</span>
             </div>
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/20">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50 dark:bg-slate-950/20">
             {messages.length === 0 ? (
               <div className="py-16 text-center text-xs text-slate-400">
                 No previous messages in this channel. Send a message to start collaboration.
@@ -221,7 +221,7 @@ export default function Chat() {
                     className={`flex flex-col ${isSelf ? "items-end" : "items-start"}`}
                   >
                     <div className="mb-1 flex items-center gap-2 text-xs text-slate-400 px-1">
-                      <span className="font-semibold text-slate-700">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
                         {isSelf ? "You" : m.sender?.name || m.sender?.email || "Collaborator"}
                       </span>
                       <span>
@@ -236,7 +236,7 @@ export default function Chat() {
                       className={`max-w-md rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-2xs ${
                         isSelf
                           ? "bg-indigo-600 text-white rounded-tr-xs"
-                          : "bg-white border border-slate-200 text-slate-800 rounded-tl-xs"
+                          : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-xs"
                       }`}
                     >
                       {m.content}
@@ -256,14 +256,14 @@ export default function Chat() {
           </div>
 
           {/* Input Box */}
-          <form onSubmit={handleSendMessage} className="border-t border-slate-200 p-4 bg-white">
+          <form onSubmit={handleSendMessage} className="border-t border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={handleInputChange}
                 placeholder={`Message #${activeProject?.title || "channel"}...`}
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 transition"
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500 focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 transition"
               />
               <button
                 type="submit"

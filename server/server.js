@@ -56,6 +56,7 @@ app.use("/api/chat", require("./routes/chatRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api", require("./routes/documentRoutes"));
 app.use("/api", require("./routes/taskRoutes"));
+app.use("/api", require("./routes/resourceRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);

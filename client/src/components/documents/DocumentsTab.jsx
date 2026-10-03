@@ -67,15 +67,15 @@ export default function DocumentsTab({ projectId, project }) {
   };
 
   if (loading) {
-    return <div className="py-12 text-center text-slate-500">Loading documents...</div>;
+    return <div className="py-12 text-center text-slate-500 dark:text-slate-400">Loading documents...</div>;
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Project Documents</h2>
-          <p className="text-xs text-slate-500">Manage research papers, datasets, and files</p>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Project Documents</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Manage research papers, datasets, and files</p>
         </div>
         {canUpload && (
           <button
@@ -88,9 +88,9 @@ export default function DocumentsTab({ projectId, project }) {
       </div>
 
       {documents.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center shadow-sm">
           <FileText className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-          <p className="text-sm font-semibold text-slate-700">No documents in this project yet.</p>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No documents in this project yet.</p>
           {canUpload && (
             <button
               onClick={() => setShowUploadModal(true)}
@@ -101,9 +101,9 @@ export default function DocumentsTab({ projectId, project }) {
           )}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+            <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
               <tr>
                 <th className="px-6 py-3.5">Document</th>
                 <th className="px-6 py-3.5">Uploaded By</th>
@@ -112,16 +112,16 @@ export default function DocumentsTab({ projectId, project }) {
                 <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {documents.map((d) => (
-                <tr key={d._id} className="hover:bg-slate-50/70 transition-colors">
+                <tr key={d._id} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/70 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
                         <FileText size={18} />
                       </div>
                       <div>
-                        <div className="font-semibold text-slate-900">{d.name}</div>
+                        <div className="font-semibold text-slate-900 dark:text-white">{d.name}</div>
                         {d.description && (
                           <div className="line-clamp-1 text-xs text-slate-400 mt-0.5">
                             {d.description}
@@ -130,13 +130,13 @@ export default function DocumentsTab({ projectId, project }) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-xs font-medium text-slate-600">
+                  <td className="px-6 py-4 text-xs font-medium text-slate-600 dark:text-slate-400">
                     {d.uploadedBy?.name || "Unknown"}
                   </td>
-                  <td className="px-6 py-4 text-xs font-mono text-slate-500">
+                  <td className="px-6 py-4 text-xs font-mono text-slate-500 dark:text-slate-400">
                     {formatFileSize(d.fileSize)}
                   </td>
-                  <td className="px-6 py-4 text-xs text-slate-500">
+                  <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
                     {new Date(d.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">

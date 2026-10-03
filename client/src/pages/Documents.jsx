@@ -99,8 +99,8 @@ export default function Documents({ defaultCategory }) {
     <div className="mx-auto max-w-7xl animate-fade-in space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Research Documents</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Research Documents</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Central repository for research papers, datasets, manuscripts, and project assets.
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function Documents({ defaultCategory }) {
       </div>
 
       {/* Category Pills & Search */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
           {categories.map((cat) => (
             <button
@@ -123,7 +123,7 @@ export default function Documents({ defaultCategory }) {
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
                 category === cat.id
                   ? "bg-indigo-600 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  : "bg-slate-100 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
               }`}
             >
               {cat.name}
@@ -138,26 +138,26 @@ export default function Documents({ defaultCategory }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search documents..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-indigo-500 focus:bg-white transition"
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none focus:border-indigo-500 focus:bg-white dark:bg-slate-900 transition"
           />
         </form>
       </div>
 
       {/* Documents Grid / Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-slate-400">Loading documents...</div>
         ) : documents.length === 0 ? (
           <div className="p-12 text-center text-slate-400">
             <FileText className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-            <p className="font-semibold text-slate-700">No documents found</p>
+            <p className="font-semibold text-slate-700 dark:text-slate-300">No documents found</p>
             <p className="text-xs text-slate-400 mt-1">Upload research papers or raw datasets to get started.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                   <th className="p-4">Document Title</th>
                   <th className="p-4">Category</th>
                   <th className="p-4">Project</th>
@@ -166,32 +166,32 @@ export default function Documents({ defaultCategory }) {
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {documents.map((doc) => (
-                  <tr key={doc._id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={doc._id} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/60 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                           <FileText size={18} />
                         </div>
                         <div>
-                          <p className="font-semibold text-sm text-slate-900">{doc.name}</p>
+                          <p className="font-semibold text-sm text-slate-900 dark:text-white">{doc.name}</p>
                           {doc.description && <p className="text-xs text-slate-400 line-clamp-1">{doc.description}</p>}
                         </div>
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:text-slate-300 capitalize">
                         {doc.category || "Other"}
                       </span>
                     </td>
-                    <td className="p-4 text-sm font-medium text-slate-700">
+                    <td className="p-4 text-sm font-medium text-slate-700 dark:text-slate-300">
                       {doc.project?.title || "General"}
                     </td>
-                    <td className="p-4 text-xs text-slate-500">
+                    <td className="p-4 text-xs text-slate-500 dark:text-slate-400">
                       {doc.uploadedBy?.name || doc.uploadedBy?.email || "Unknown"}
                     </td>
-                    <td className="p-4 text-xs font-mono text-slate-500">
+                    <td className="p-4 text-xs font-mono text-slate-500 dark:text-slate-400">
                       {formatFileSize(doc.fileSize)}
                     </td>
                     <td className="p-4 text-right">

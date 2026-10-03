@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import { ThemeProvider } from "./context/ThemeContext";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/auth/Login";
@@ -17,6 +18,7 @@ import InvitationPage from "./pages/projects/InvitationPage";
 
 import Tasks from "./pages/Tasks";
 import Documents from "./pages/Documents";
+import Resources from "./pages/Resources";
 import Team from "./pages/Team";
 import Chat from "./pages/Chat";
 import Notifications from "./pages/Notifications";
@@ -30,70 +32,72 @@ import UserManagement from "./pages/admin/UserManagement";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Toaster position="top-right" />
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <Toaster position="top-right" />
 
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Invitation Route */}
-          <Route
-            path="/invitations/:token"
-            element={<InvitationPage />}
-          />
+            {/* Invitation Route */}
+            <Route
+              path="/invitations/:token"
+              element={<InvitationPage />}
+            />
 
-          {/* Protected App Routes */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Protected App Routes */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
 
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:id" element={<ProjectDetail />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route path="/resources" element={<Documents defaultCategory="dataset" />} />
-            <Route path="/papers" element={<Documents defaultCategory="paper" />} />
-            <Route path="/team" element={<Team />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/:id" element={<ProjectDetail />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/documents" element={<Documents />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/papers" element={<Documents defaultCategory="paper" />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin/login"
-            element={<AdminLogin />}
-          />
+            {/* Admin Routes */}
+            <Route
+              path="/admin/login"
+              element={<AdminLogin />}
+            />
 
-          <Route
-            path="/admin/dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminDashboard />
-              </AdminProtectedRoute>
-            }
-          />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminDashboard />
+                </AdminProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/admin/users"
-            element={
-              <AdminProtectedRoute>
-                <UserManagement />
-              </AdminProtectedRoute>
-            }
-          />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            <Route
+              path="/admin/users"
+              element={
+                <AdminProtectedRoute>
+                  <UserManagement />
+                </AdminProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

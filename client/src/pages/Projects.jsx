@@ -17,13 +17,13 @@ export default function Projects() {
     <>
       <div className="mx-auto max-w-[1300px] animate-fade-in">
         <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Projects</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Projects</h1>
         <button onClick={() => setShowModal(true)} className="flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus size={16} /> New Project
         </button>
       </div>
-      {loading ? <p className="text-slate-500">Loading...</p> : projects.length === 0 ? (
-        <p className="text-slate-500">No projects yet. Create your first one!</p>
+      {loading ? <p className="text-slate-500 dark:text-slate-400">Loading...</p> : projects.length === 0 ? (
+        <p className="text-slate-500 dark:text-slate-400">No projects yet. Create your first one!</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {projects.map((p) => <ProjectCard key={p._id} project={p} />)}
