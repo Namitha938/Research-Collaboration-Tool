@@ -88,7 +88,8 @@ export default function Dashboard() {
     .slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-[1300px] animate-fade-in">
+    <>
+      <div className="mx-auto max-w-[1300px] animate-fade-in">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{greeting()}, {user?.name} 👋</h1>
@@ -188,10 +189,11 @@ export default function Dashboard() {
           <Link to="/projects" className="mt-2 block text-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary-600">View All Projects</Link>
         </aside>
       </div>
+      </div>
 
       {showModal && (
         <NewProjectModal onClose={() => setShowModal(false)} onCreated={(p) => setProjects([p, ...projects])} />
       )}
-    </div>
+    </>
   );
 }

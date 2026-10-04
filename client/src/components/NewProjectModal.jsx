@@ -30,8 +30,8 @@ export default function NewProjectModal({ onClose, onCreated }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-      <form onSubmit={submit} className="w-full max-w-lg space-y-4 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/60 backdrop-blur-sm dark:bg-slate-900/80 p-4 animate-in fade-in duration-200">
+      <form onSubmit={submit} className="w-full max-w-lg space-y-4 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-xl animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">New Research Project</h2>
           <button type="button" onClick={onClose} aria-label="Close"><X size={20} /></button>
