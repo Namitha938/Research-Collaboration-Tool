@@ -26,8 +26,9 @@ export default function Chat() {
 
   useEffect(() => {
     const socket = io(SOCKET_URL, {
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
       withCredentials: true,
+      auth: { token: localStorage.getItem("token") }
     });
     socketRef.current = socket;
 
@@ -110,6 +111,13 @@ export default function Chat() {
     });
 
     setInputMessage("");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e);
+    }
   };
 
   if (loading) {
@@ -239,7 +247,7 @@ export default function Chat() {
                           : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-xs"
                       }`}
                     >
-                      {m.content}
+                      <div className="whitespace-pre-wrap">{m.content}</div>
                     </div>
                   </div>
                 );
@@ -258,12 +266,13 @@ export default function Chat() {
           {/* Input Box */}
           <form onSubmit={handleSendMessage} className="border-t border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
             <div className="flex gap-2">
-              <input
-                type="text"
+              <textarea
                 value={inputMessage}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder={`Message #${activeProject?.title || "channel"}...`}
-                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500 focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 transition"
+                rows={1}
+                className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500 focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 transition"
               />
               <button
                 type="submit"
