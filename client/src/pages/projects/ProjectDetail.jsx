@@ -85,9 +85,14 @@ const ProjectDetail = () => {
             </span>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{project.title}</h1>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors shrink-0">
-            <Settings size={16} /> Manage Project
-          </button>
+          {(project.owner?._id === user?.id || project.owner === user?.id) && (
+            <Link 
+              to={`/projects/${project._id}/manage`}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors shrink-0"
+            >
+              <Settings size={16} /> Manage Project
+            </Link>
+          )}
         </div>
 
         <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-4xl mb-8">

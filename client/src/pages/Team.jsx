@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Search, Shield, UserCheck, Copy, Check } from "lucide-react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { Search, Shield, UserCheck, Copy, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 
@@ -8,16 +8,53 @@ export default function Team() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState(null);
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  const debounceTimeout = useRef(null);
+
+  const fetchResearchers = useCallback(async (currentPage, currentSearch) => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/auth/collaborators`, {
+        params: {
+          page: currentPage,
+          limit: 12,
+          search: currentSearch
+        }
+      });
+      setResearchers(res.data.researchers || []);
+      setTotalPages(res.data.pagination?.totalPages || 1);
+      setTotal(res.data.pagination?.total || 0);
+    } catch (err) {
+      toast.error("Unable to load researchers");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    api
-      .get("/auth/collaborators")
-      .then((res) => {
-        setResearchers(res.data.researchers || []);
-      })
-      .catch(() => toast.error("Could not load research community"))
-      .finally(() => setLoading(false));
-  }, []);
+    fetchResearchers(page, searchTerm);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]); // Re-fetch only when page changes
+
+  // Handle search with debounce
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setPage(1); // Reset to first page on new search
+    
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    
+    debounceTimeout.current = setTimeout(() => {
+      fetchResearchers(1, value);
+    }, 500);
+  };
 
   const handleCopyEmail = (email, id) => {
     navigator.clipboard.writeText(email);
@@ -25,12 +62,6 @@ export default function Team() {
     toast.success("Email copied to clipboard");
     setTimeout(() => setCopiedId(null), 2000);
   };
-
-  const filtered = researchers.filter(
-    (r) =>
-      r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="mx-auto max-w-[1300px] animate-fade-in space-y-6">
@@ -48,7 +79,7 @@ export default function Team() {
             type="text"
             placeholder="Search researchers..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2 pl-9 pr-3 text-sm shadow-sm outline-none focus:border-primary-500"
           />
         </div>
@@ -56,13 +87,27 @@ export default function Team() {
 
       {loading ? (
         <div className="py-20 text-center text-slate-400">Loading researchers...</div>
-      ) : filtered.length === 0 ? (
+      ) : researchers.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">No researchers found matching "{searchTerm}".</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {searchTerm ? `No researchers found matching "${searchTerm}".` : "No researchers found."}
+          </p>
+          {searchTerm && (
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                fetchResearchers(1, "");
+              }}
+              className="mt-4 text-primary-600 hover:underline text-sm font-medium"
+            >
+              Clear Search
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((r) => {
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {researchers.map((r) => {
             const isCopied = copiedId === r._id;
             return (
               <div
@@ -107,6 +152,34 @@ export default function Team() {
               </div>
             );
           })}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Showing <span className="font-medium text-slate-900 dark:text-white">{(page - 1) * 12 + 1}</span> to{" "}
+                <span className="font-medium text-slate-900 dark:text-white">{Math.min(page * 12, total)}</span> of{" "}
+                <span className="font-medium text-slate-900 dark:text-white">{total}</span> researchers
+              </p>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

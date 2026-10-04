@@ -178,10 +178,56 @@ const updateProfile = async (req, res) => {
   }
 };
 
+// @desc    Get all collaborators/researchers for the global directory
+// @route   GET /api/auth/collaborators
+// @access  Private
+const getCollaborators = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const search = req.query.search || '';
+    
+    // Build query
+    const query = { _id: { $ne: req.user._id } }; // Exclude current user
+    
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Execute query with pagination
+    const startIndex = (page - 1) * limit;
+    const total = await User.countDocuments(query);
+    
+    const researchers = await User.find(query)
+      .select('name email role createdAt')
+      .sort({ name: 1 })
+      .skip(startIndex)
+      .limit(limit);
+      
+    res.json({
+      success: true,
+      researchers,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching collaborators:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
   logoutUser,
   updateProfile,
+  getCollaborators,
 };
