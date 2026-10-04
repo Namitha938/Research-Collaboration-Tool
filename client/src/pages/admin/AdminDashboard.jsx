@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { getDashboardStats } from '../../api/adminService';
 import toast from 'react-hot-toast';
+import AdminNotificationDropdown from '../../components/AdminNotificationDropdown';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -88,73 +89,73 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300 flex flex-col md:flex-row font-sans">
       
       {/* Sidebar - Desktop */}
-      <aside className="w-64 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800/80 flex-col hidden md:flex shrink-0">
-        <div className="p-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80">
+      <aside className="flex h-full w-[266px] flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300 hidden md:flex shrink-0">
+        <div className="flex h-[75px] items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 px-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 dark:bg-primary-500 text-white shadow-sm">
               <ShieldCheck size={22} />
             </div>
             <div>
-              <span className="text-lg font-bold text-white tracking-wide bg-gradient-to-r from-slate-800 via-slate-600 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-300 bg-clip-text text-transparent">
-                ControlCenter
+              <span className="text-xl font-bold text-slate-900 dark:text-white">
+                AdminPanel
               </span>
-              <span className="block text-[10px] uppercase tracking-wider font-extrabold text-indigo-400">Admin Portal v2.4</span>
+              <span className="block text-[10px] uppercase tracking-wider font-semibold text-primary-500">v2.4</span>
             </div>
           </div>
         </div>
         
-        <div className="p-4 flex-1 space-y-6 overflow-y-auto">
+        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
           <div>
-            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-3">Main Navigation</div>
-            <nav className="space-y-1.5">
-              <Link to="/admin/dashboard" className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md shadow-indigo-600/20">
+            <div className="mb-3 px-2 text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500">MAIN NAVIGATION</div>
+            <div className="space-y-1">
+              <Link to="/admin/dashboard" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
                 <LayoutDashboard size={18} /> Overview
               </Link>
-              <Link to="/admin/users" className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800/60 transition-all font-medium">
+              <Link to="/admin/users" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
                 <Users size={18} /> User Directory
               </Link>
-              <Link to="/admin/projects" className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800/60 transition-all font-medium">
+              <Link to="/admin/projects" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
                 <FolderKanban size={18} /> Research Projects
               </Link>
-              <Link to="/dashboard" className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800/60 transition-all font-medium">
+              <Link to="/dashboard" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
                 <Activity size={18} /> User Dashboard
               </Link>
-            </nav>
+            </div>
           </div>
 
-          <div>
-            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-3">Security & Compliance</div>
-            <nav className="space-y-1.5">
-              <button onClick={exportAuditLog} className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800/60 transition-all font-medium text-left">
-                <span className="flex items-center gap-3"><FileText size={18} className="text-emerald-400" /> Export Audit CSV</span>
-                <Download size={14} className="text-slate-500 dark:text-slate-400" />
+          <div className="mt-6">
+            <div className="mb-3 px-2 text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500">SECURITY & COMPLIANCE</div>
+            <div className="space-y-1">
+              <button onClick={exportAuditLog} className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-left">
+                <span className="flex items-center gap-3"><FileText size={18} className="text-emerald-500" /> Export Audit CSV</span>
+                <Download size={14} className="text-slate-400" />
               </button>
-              <Link to="/settings" className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800/60 transition-all font-medium">
+              <Link to="/settings" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
                 <Settings size={18} /> Platform Config
               </Link>
-            </nav>
+            </div>
           </div>
-        </div>
+        </nav>
         
         {/* User Card */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/50">
-          <div className="flex items-center gap-3 mb-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-sm">
+        <div className="border-t border-slate-100 dark:border-slate-800 p-4">
+          <div className="flex items-center gap-3 px-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/50 font-semibold text-primary-600 dark:text-primary-400">
               {user?.name?.charAt(0) || 'A'}
             </div>
-            <div className="flex-1 truncate">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{user?.name || "System Admin"}</p>
-              <p className="text-xs text-indigo-400 truncate">{user?.email || "admin@researchhub.edu"}</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{user?.name || "System Admin"}</p>
+              <p className="text-xs capitalize text-slate-500 dark:text-slate-400">{user?.email || "admin@researchhub.edu"}</p>
             </div>
           </div>
           <button 
             onClick={logout}
-            className="flex items-center justify-center w-full gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-rose-600/20 hover:text-rose-400 text-slate-600 dark:text-slate-300 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700/50"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
-            <LogOut size={16} /> End Session
+            <LogOut size={16} /> Logout
           </button>
         </div>
       </aside>
@@ -185,51 +186,46 @@ const AdminDashboard = () => {
       <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950">
         
         {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 px-6 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-20 flex h-[75px] items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-8 transition-colors duration-300">
           <div className="flex items-center gap-4">
-            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-white bg-slate-100 dark:bg-slate-800 rounded-lg">
-              <Menu size={20} />
+            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <Menu size={22} />
             </button>
             <div>
-              <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">System Operations Center</h1>
-              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">Monitoring lab metrics, system security, and researchers.</p>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white">System Operations Center</h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button onClick={exportAuditLog} className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/20 transition-all">
-              <Download size={14} /> Export Audit Log
+          <div className="flex items-center gap-5">
+            <button onClick={exportAuditLog} className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-semibold transition-colors">
+              <Download size={16} /> Export Audit Log
             </button>
-            <div className="relative">
-              <button className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-white border border-slate-700/60 relative">
-                <Bell size={18} />
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-indigo-500 rounded-full ring-2 ring-slate-900 animate-ping"></span>
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-indigo-500 rounded-full ring-2 ring-slate-900"></span>
-              </button>
+            <div className="flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-5">
+              <AdminNotificationDropdown />
             </div>
           </div>
         </header>
 
         {/* Banner Hero */}
-        <div className="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto space-y-8">
+        <div className="p-6 md:p-8 max-w-[1300px] mx-auto space-y-8">
           
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-100 via-purple-50 to-white dark:from-indigo-900/90 dark:via-purple-900/70 dark:to-slate-900 p-8 border border-indigo-200 dark:border-indigo-500/30 shadow-2xl shadow-indigo-950">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
+          <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 rounded-full bg-primary-100/50 dark:bg-primary-900/10 blur-3xl pointer-events-none"></div>
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               <div className="space-y-2">
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Platform Operational
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Platform Operational
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
                   Welcome to Executive Admin Panel
                 </h2>
-                <p className="text-slate-600 dark:text-slate-300 text-sm max-w-xl">
+                <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl">
                   Manage enterprise researchers, verify institutional credentials, and oversee live collaborative research workflows across global teams.
                 </p>
               </div>
 
               <div className="flex gap-3">
-                <Link to="/admin/users" className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 hover:scale-105 transition-all">
+                <Link to="/admin/users" className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
                   Manage Users & Roles
                 </Link>
               </div>
@@ -248,24 +244,19 @@ const AdminDashboard = () => {
                 return (
                   <div 
                     key={idx} 
-                    className="relative group rounded-3xl bg-white dark:bg-slate-900/80 p-6 border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 overflow-hidden"
+                    className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm"
                   >
-                    <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${stat.gradient}`}></div>
-                    
                     <div className="flex justify-between items-start mb-4">
-                      <div className={`p-3.5 rounded-2xl bg-gradient-to-tr ${stat.gradient} text-white shadow-lg`}>
-                        <Icon size={22} />
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400`}>
+                        <Icon size={18} />
                       </div>
-                      <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        {stat.badge}
-                      </span>
                     </div>
 
                     <div>
-                      <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-1">{stat.value}</h3>
-                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">{stat.label}</p>
-                      <p className={`text-xs font-bold ${stat.accent} flex items-center gap-1`}>
-                        <TrendingUp size={12} /> {stat.trend}
+                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{stat.label}</p>
+                      <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
+                      <p className={`mt-2 text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1`}>
+                        <TrendingUp size={14} className="text-primary-500" /> {stat.trend}
                       </p>
                     </div>
                   </div>
@@ -278,19 +269,19 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 gap-8">
             
             {/* Recent Registrations Side Panel */}
-            <div className="rounded-3xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-6 shadow-xl flex flex-col justify-between">
+            <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Users className="text-purple-400" size={20} /> New Researchers
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Users size={18} className="text-primary-500" /> New Researchers
                   </h3>
-                  <Link to="/admin/users" className="text-xs font-bold text-indigo-400 hover:text-indigo-300">View All</Link>
+                  <Link to="/admin/users" className="text-sm font-medium text-primary-600 hover:underline">View All</Link>
                 </div>
 
-                <div className="space-y-4">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   {loading ? (
                     <div className="text-center py-4">
-                      <span className="text-indigo-400 text-sm">Loading recent users...</span>
+                      <span className="text-slate-500 dark:text-slate-400 text-sm">Loading recent users...</span>
                     </div>
                   ) : recentRegistrations.length === 0 ? (
                     <div className="text-center py-4 text-slate-500 dark:text-slate-400 text-sm">
@@ -298,18 +289,18 @@ const AdminDashboard = () => {
                     </div>
                   ) : (
                     recentRegistrations.map((userItem, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 hover:border-slate-700 transition-all">
-                        <div className="w-10 h-10 rounded-full bg-indigo-500/40 flex items-center justify-center text-white font-bold text-lg">
+                      <div key={i} className="flex items-center gap-3 py-4 first:pt-0 last:pb-0">
+                        <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold text-sm">
                           {userItem.name.charAt(0)}
                         </div>
-                        <div className="flex-1 truncate">
-                          <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{userItem.name}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{userItem.name}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{userItem.email}</p>
                         </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        <span className={`text-xs font-medium capitalize ${
                           userItem.role === 'admin' 
-                            ? 'bg-purple-950 text-purple-400 border border-purple-500/30' 
-                            : 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'
+                            ? 'text-purple-600 dark:text-purple-400' 
+                            : 'text-emerald-600 dark:text-emerald-400'
                         }`}>
                           {userItem.role}
                         </span>
@@ -317,12 +308,6 @@ const AdminDashboard = () => {
                     ))
                   )}
                 </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <Link to="/admin/users" className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">
-                  Manage Access Permissions <ArrowUpRight size={14} />
-                </Link>
               </div>
             </div>
 
