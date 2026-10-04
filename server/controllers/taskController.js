@@ -5,6 +5,18 @@ const mongoose = require("mongoose");
 const createNotification = require("../utils/createNotification");
 const { createActivity } = require("../utils/createActivity");
 
+// Helper to update project progress based on tasks
+const updateProjectProgress = async (projectId) => {
+  const totalTasks = await Task.countDocuments({ project: projectId });
+  if (totalTasks === 0) {
+    await Project.findByIdAndUpdate(projectId, { progress: 0 });
+    return;
+  }
+  const completedTasks = await Task.countDocuments({ project: projectId, status: 'completed' });
+  const progress = Math.round((completedTasks / totalTasks) * 100);
+  await Project.findByIdAndUpdate(projectId, { progress });
+};
+
 // Helper to check project membership and get role
 const checkProjectMembership = async (projectId, userId) => {
   const project = await Project.findById(projectId);
@@ -102,6 +114,8 @@ const createTask = async (req, res) => {
         message: `assigned task "${title}" to a team member`
       });
     }
+
+    await updateProjectProgress(projectId);
 
     res.status(201).json({ success: true, message: "Task created successfully", task: populatedTask });
   } catch (error) {
@@ -275,6 +289,8 @@ const updateTaskStatus = async (req, res) => {
     task.status = status;
     await task.save();
 
+    await updateProjectProgress(task.project);
+
     if (status === "completed" && current !== "completed") {
       const taskProject = await Project.findById(task.project);
       if (taskProject && taskProject.owner.toString() !== req.user._id.toString()) {
@@ -390,6 +406,8 @@ const deleteTask = async (req, res) => {
     }
 
     await Task.findByIdAndDelete(req.params.taskId);
+
+    await updateProjectProgress(task.project);
 
     res.json({ success: true, message: "Task deleted successfully" });
   } catch (error) {

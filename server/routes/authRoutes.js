@@ -6,6 +6,7 @@ const {
   getCurrentUser,
   logoutUser,
   updateProfile,
+  getCollaborators,
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -32,5 +33,9 @@ router.put("/profile", authMiddleware, updateProfile);
 // @route   POST /api/auth/logout
 // @access  Public
 router.post("/logout", logoutUser);
+
+// @route   GET /api/auth/collaborators
+// @access  Private
+router.get("/collaborators", authMiddleware, getCollaborators);
 
 module.exports = router;

@@ -1,4 +1,16 @@
 const Project = require("../models/Project");
+const Task = require("../models/Task");
+const Document = require("../models/Document");
+const Resource = require("../models/Resource");
+const ResearchPaper = require("../models/ResearchPaper");
+const Reference = require("../models/Reference");
+const Milestone = require("../models/Milestone");
+const Activity = require("../models/Activity");
+const Message = require("../models/Message");
+const Notification = require("../models/Notification");
+const Invitation = require("../models/Invitation");
+const cloudinary = require("../config/cloudinary");
+
 const { createActivity } = require("../utils/createActivity");
 const notifyAdmins = require("../utils/notifyAdmins");
 
@@ -110,24 +122,73 @@ const updateProject = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to update this project. Only the owner can make changes." });
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(req.params.id, req.body, {
+    const { title, description, researchArea, startDate, deadline, status } = req.body;
+    
+    // Status transition validation
+    if (status && status !== project.status) {
+      const allowedTransitions = {
+        active: ['completed', 'archived'],
+        completed: ['archived'],
+        archived: [] // No transitions out of archived (or maybe allow back to active? Let's stick to prompt recommendations)
+      };
+      
+      // If the prompt explicitly recommended transitions: active->completed, active->archived, completed->archived
+      if (!allowedTransitions[project.status]?.includes(status)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Invalid status transition from ${project.status} to ${status}` 
+        });
+      }
+    }
+
+    // Prepare update object safely
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (researchArea) updateData.researchArea = researchArea;
+    if (startDate !== undefined) updateData.startDate = startDate;
+    if (deadline !== undefined) updateData.deadline = deadline;
+    if (status) updateData.status = status;
+
+    const updatedProject = await Project.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     })
       .populate("owner", "name email")
       .populate("members.user", "name email");
 
-    await createActivity({
-      actor: req.user._id,
-      project: project._id,
-      type: 'PROJECT_UPDATED',
-      entityType: 'project',
-      entityId: project._id,
-      message: `updated project details`
-    });
+    // Log specific activities based on what changed
+    if (status === 'archived' && project.status !== 'archived') {
+      await createActivity({
+        actor: req.user._id,
+        project: project._id,
+        type: 'PROJECT_ARCHIVED',
+        entityType: 'project',
+        entityId: project._id,
+        message: `archived the project`
+      });
+    } else if (status && status !== project.status) {
+      await createActivity({
+        actor: req.user._id,
+        project: project._id,
+        type: 'PROJECT_STATUS_CHANGED',
+        entityType: 'project',
+        entityId: project._id,
+        message: `changed project status to ${status}`
+      });
+    } else {
+      await createActivity({
+        actor: req.user._id,
+        project: project._id,
+        type: 'PROJECT_UPDATED',
+        entityType: 'project',
+        entityId: project._id,
+        message: `updated project details`
+      });
+    }
 
     // If status changed to completed
-    if (req.body.status === "completed" && project.status !== "completed") {
+    if (status === "completed" && project.status !== "completed") {
       notifyAdmins({
         type: "admin_project_completed",
         title: "Project Completed",
@@ -138,6 +199,7 @@ const updateProject = async (req, res) => {
 
     res.json({ success: true, project: updatedProject });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -147,7 +209,8 @@ const updateProject = async (req, res) => {
 // @access  Private (Owner only)
 const deleteProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const projectId = req.params.id;
+    const project = await Project.findById(projectId);
 
     if (!project) {
       return res.status(404).json({ success: false, message: "Project not found" });
@@ -158,9 +221,50 @@ const deleteProject = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to delete this project. Only the owner can delete." });
     }
 
+    // 1. Find and delete Cloudinary assets for Documents
+    const documents = await Document.find({ project: projectId });
+    for (const doc of documents) {
+      if (doc.publicId) {
+        await cloudinary.uploader.destroy(doc.publicId).catch(err => console.error("Cloudinary delete error (Document):", err));
+      }
+    }
+
+    // 2. Find and delete Cloudinary assets for Resources
+    const resources = await Resource.find({ project: projectId });
+    for (const resDoc of resources) {
+      if (resDoc.publicId) {
+        await cloudinary.uploader.destroy(resDoc.publicId).catch(err => console.error("Cloudinary delete error (Resource):", err));
+      }
+    }
+
+    // 3. Find and delete Cloudinary assets for Research Papers
+    const papers = await ResearchPaper.find({ project: projectId });
+    for (const paper of papers) {
+      if (paper.pdfPublicId) {
+        await cloudinary.uploader.destroy(paper.pdfPublicId).catch(err => console.error("Cloudinary delete error (Paper):", err));
+      }
+    }
+
+    // 4. Delete MongoDB records in all associated collections
+    await Promise.all([
+      Task.deleteMany({ project: projectId }),
+      Document.deleteMany({ project: projectId }),
+      Resource.deleteMany({ project: projectId }),
+      ResearchPaper.deleteMany({ project: projectId }),
+      Reference.deleteMany({ project: projectId }),
+      Milestone.deleteMany({ project: projectId }),
+      Activity.deleteMany({ project: projectId }),
+      Message.deleteMany({ project: projectId }),
+      Notification.deleteMany({ project: projectId }),
+      Invitation.deleteMany({ project: projectId }),
+    ]);
+
+    // 5. Finally, delete the project itself
     await project.deleteOne();
-    res.json({ success: true, message: "Project removed successfully" });
+    
+    res.json({ success: true, message: "Project deleted successfully" });
   } catch (error) {
+    console.error("Error deleting project:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

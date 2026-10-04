@@ -14,6 +14,7 @@ import Projects from "./pages/Projects";
 
 import ProjectCreate from "./pages/projects/ProjectCreate";
 import ProjectDetail from "./pages/projects/ProjectDetail";
+import ManageProject from "./pages/projects/ManageProject";
 import InvitationPage from "./pages/projects/InvitationPage";
 
 import Tasks from "./pages/Tasks";
@@ -63,6 +64,7 @@ export default function App() {
 
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/:id" element={<ProjectDetail />} />
+              <Route path="/projects/:id/manage" element={<ManageProject />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/documents" element={<Documents />} />
               <Route path="/resources" element={<Resources />} />

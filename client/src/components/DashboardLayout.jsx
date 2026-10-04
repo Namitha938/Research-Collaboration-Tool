@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   Atom, LayoutGrid, FolderKanban, SquareCheckBig, FileText, Database,
-  BookOpen, Users, MessageSquare, Bell, Settings, LogOut, Search, Menu,
+  BookOpen, Users, MessageSquare, Bell, Settings, LogOut, Search, Menu, Loader2, X
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
@@ -27,6 +27,42 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({ projects: [], tasks: [] });
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Debounced Search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults({ projects: [], tasks: [] });
+      setIsSearching(false);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await api.get(`/search?q=${encodeURIComponent(searchQuery)}`);
+        if (res.data.success) {
+          setSearchResults({
+            projects: res.data.projects || [],
+            tasks: res.data.tasks || []
+          });
+          setShowDropdown(true);
+        }
+      } catch (err) {
+        console.error("Search failed", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400); // 400ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchUnread = async () => {
@@ -130,11 +166,101 @@ export default function DashboardLayout() {
               <Menu size={22} />
             </button>
             <div className="relative hidden sm:block">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 dark:text-slate-400" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => {
+                  if (searchQuery.trim()) setShowDropdown(true);
+                }}
                 placeholder="Search projects, tasks..."
-                className="w-72 rounded-lg bg-slate-50 dark:bg-slate-950 dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm text-slate-900 dark:text-white dark:text-slate-100 border border-transparent dark:border-slate-800 outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="w-72 rounded-lg bg-slate-50 dark:bg-slate-950 py-2.5 pl-10 pr-10 text-sm text-slate-900 dark:text-white border border-transparent dark:border-slate-800 outline-none focus:ring-2 focus:ring-primary-500/20"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setShowDropdown(false);
+                  }}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                >
+                  <X size={14} />
+                </button>
+              )}
+
+              {/* Search Dropdown */}
+              {showDropdown && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+                  <div className="absolute left-0 top-full mt-2 w-[400px] max-h-[80vh] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl z-50 p-2">
+                    {isSearching ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="animate-spin text-primary-500" size={24} />
+                      </div>
+                    ) : (
+                      <>
+                        {searchResults.projects.length === 0 && searchResults.tasks.length === 0 ? (
+                          <div className="text-center py-6 text-sm text-slate-500 dark:text-slate-400">
+                            No results found for "{searchQuery}"
+                          </div>
+                        ) : (
+                          <>
+                            {searchResults.projects.length > 0 && (
+                              <div className="mb-2">
+                                <h3 className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">Projects</h3>
+                                {searchResults.projects.map((p) => (
+                                  <div
+                                    key={p._id}
+                                    onClick={() => {
+                                      navigate(`/projects/${p._id}`);
+                                      setShowDropdown(false);
+                                      setSearchQuery("");
+                                    }}
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                  >
+                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                                      <FolderKanban size={14} />
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium text-slate-900 dark:text-white">{p.title}</p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate w-64">{p.description}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {searchResults.tasks.length > 0 && (
+                              <div>
+                                <h3 className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">Tasks</h3>
+                                {searchResults.tasks.map((t) => (
+                                  <div
+                                    key={t._id}
+                                    onClick={() => {
+                                      navigate(`/projects/${t.project?._id || t.project}`);
+                                      setShowDropdown(false);
+                                      setSearchQuery("");
+                                    }}
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                  >
+                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                                      <SquareCheckBig size={14} />
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium text-slate-900 dark:text-white">{t.title}</p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400">In project {t.project?.title || "..."}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
