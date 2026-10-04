@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, ExternalLink, Download, FileText, Calendar, BookOpen, Edit2, Trash2 } from 'lucide-react';
 
 const formatDate = (dateString) => {
@@ -14,8 +15,10 @@ const PaperDetailModal = ({ paper, userRole, userId, onClose, onEdit, onDelete }
   const adderId = paper.addedBy?._id || paper.addedBy;
   const canEdit = userRole === 'owner' || (userRole === 'researcher' && adderId === userId);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 animate-in fade-in duration-200">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/60 dark:bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-xl animate-in zoom-in-95 duration-200">
         <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
           <div className="pr-8">
@@ -151,7 +154,8 @@ const PaperDetailModal = ({ paper, userRole, userId, onClose, onEdit, onDelete }
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

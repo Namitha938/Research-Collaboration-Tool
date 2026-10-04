@@ -117,15 +117,15 @@ const ResearchPapersTab = ({ projectId, project }) => {
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col md:flex-row gap-3 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
             type="text" 
             placeholder="Search papers by title, author, tag..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-slate-900 dark:text-white"
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-slate-900 dark:text-white"
           />
         </div>
         <div className="flex gap-2">
@@ -133,7 +133,7 @@ const ResearchPapersTab = ({ projectId, project }) => {
             <select 
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-slate-700 dark:text-slate-300 min-w-[120px]"
+              className="appearance-none pl-3 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-slate-700 dark:text-slate-300 min-w-[120px]"
             >
               <option value="all">All Files</option>
               <option value="withPdf">With PDF</option>
@@ -144,7 +144,7 @@ const ResearchPapersTab = ({ projectId, project }) => {
             <select 
               value={filterYear}
               onChange={(e) => setFilterYear(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-slate-700 dark:text-slate-300 min-w-[100px]"
+              className="appearance-none pl-3 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-slate-700 dark:text-slate-300 min-w-[100px]"
             >
               <option value="all">All Years</option>
               {uniqueYears.map(year => (
