@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, LayoutDashboard, ShieldCheck, LogOut, Search, Filter, FolderKanban } from 'lucide-react';
+import { FolderKanban, LayoutDashboard, ShieldCheck, LogOut, Search, Filter, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getUsers } from '../../api/adminService';
+import { getProjects } from '../../api/adminService';
 import toast from 'react-hot-toast';
 
-const UserManagement = () => {
+const ProjectManagement = () => {
   const { user, logout } = useAuth();
-  
-  const [usersList, setUsersList] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 1 });
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
 
   useEffect(() => {
-    fetchUsers(1);
-  }, [roleFilter]);
+    fetchProjects(1);
+  }, [statusFilter]);
 
-  const fetchUsers = async (page) => {
+  const fetchProjects = async (page) => {
     try {
       setLoading(true);
-      const res = await getUsers({ page, limit: pagination.limit, search: searchTerm, role: roleFilter });
+      const res = await getProjects({ page, limit: pagination.limit, search: searchTerm, status: statusFilter });
       if (res.success) {
-        setUsersList(res.data);
+        setProjects(res.data);
         setPagination(res.pagination);
       }
     } catch (error) {
-      toast.error('Failed to fetch users');
+      toast.error('Failed to fetch projects');
     } finally {
       setLoading(false);
     }
@@ -35,12 +34,12 @@ const UserManagement = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchUsers(1);
+    fetchProjects(1);
   };
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= pagination.totalPages) {
-      fetchUsers(newPage);
+      fetchProjects(newPage);
     }
   };
 
@@ -60,10 +59,10 @@ const UserManagement = () => {
             <Link to="/admin/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white transition-colors">
               <LayoutDashboard size={18} /> Overview
             </Link>
-            <Link to="/admin/users" className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-600/10 text-primary-400 font-medium">
+            <Link to="/admin/users" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white transition-colors">
               <Users size={18} /> Users
             </Link>
-            <Link to="/admin/projects" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white transition-colors">
+            <Link to="/admin/projects" className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-600/10 text-primary-400 font-medium">
               <FolderKanban size={18} /> Projects
             </Link>
           </nav>
@@ -90,7 +89,6 @@ const UserManagement = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Mobile Header */}
         <div className="md:hidden bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <ShieldCheck size={20} className="text-primary-400" />
@@ -104,8 +102,8 @@ const UserManagement = () => {
         <div className="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">User Management</h1>
-              <p className="text-slate-500 dark:text-slate-400 mt-1">Manage platform users, roles, and access.</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Project Management</h1>
+              <p className="text-slate-500 dark:text-slate-400 mt-1">Manage and view platform projects.</p>
             </div>
           </div>
 
@@ -116,7 +114,7 @@ const UserManagement = () => {
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
                 <input 
                   type="text" 
-                  placeholder="Search users..." 
+                  placeholder="Search projects..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-transparent text-slate-900 dark:text-white"
@@ -125,13 +123,14 @@ const UserManagement = () => {
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Filter size={16} className="text-slate-500 dark:text-slate-400" />
                 <select 
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
                   className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm bg-transparent text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                 >
-                  <option value="All">All Roles</option>
-                  <option value="admin">Admin</option>
-                  <option value="researcher">Researcher</option>
+                  <option value="All">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                  <option value="archived">Archived</option>
                 </select>
               </div>
             </div>
@@ -141,45 +140,42 @@ const UserManagement = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
-                    <th className="p-4">Name</th>
-                    <th className="p-4">Email</th>
-                    <th className="p-4">Role</th>
+                    <th className="p-4">Title</th>
+                    <th className="p-4">Owner</th>
+                    <th className="p-4">Research Area</th>
                     <th className="p-4">Status</th>
-                    <th className="p-4">Joined Date</th>
+                    <th className="p-4">Created Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {loading ? (
                     <tr>
-                      <td colSpan="5" className="p-8 text-center text-slate-500">Loading users...</td>
+                      <td colSpan="5" className="p-8 text-center text-slate-500">Loading projects...</td>
                     </tr>
-                  ) : usersList.length === 0 ? (
+                  ) : projects.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="p-8 text-center text-slate-500">No users found.</td>
+                      <td colSpan="5" className="p-8 text-center text-slate-500">No projects found.</td>
                     </tr>
                   ) : (
-                    usersList.map((usr) => (
-                      <tr key={usr._id} className="hover:bg-slate-50 dark:hover:bg-slate-100 dark:bg-slate-800 dark:bg-slate-950/50 transition-colors">
+                    projects.map((project) => (
+                      <tr key={project._id} className="hover:bg-slate-50 dark:hover:bg-slate-100 dark:bg-slate-800 dark:bg-slate-950/50 transition-colors">
                         <td className="p-4">
-                          <div className="font-medium text-slate-900 dark:text-white">{usr.name}</div>
+                          <div className="font-medium text-slate-900 dark:text-white">{project.title}</div>
                         </td>
-                        <td className="p-4 text-slate-600 dark:text-slate-400 text-sm">{usr.email}</td>
+                        <td className="p-4 text-slate-600 dark:text-slate-400 text-sm">{project.owner?.name} ({project.owner?.email})</td>
+                        <td className="p-4 text-slate-600 dark:text-slate-400 text-sm">{project.researchArea}</td>
                         <td className="p-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
-                            usr.role === 'admin' 
-                              ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' 
-                              : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                            project.status === 'active' 
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' 
+                              : project.status === 'completed'
+                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
                           }`}>
-                            {usr.role}
+                            {project.status}
                           </span>
                         </td>
-                        <td className="p-4">
-                          <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            Active
-                          </span>
-                        </td>
-                        <td className="p-4 text-slate-500 dark:text-slate-400 text-sm">{new Date(usr.createdAt).toLocaleDateString()}</td>
+                        <td className="p-4 text-slate-500 dark:text-slate-400 text-sm">{new Date(project.createdAt).toLocaleDateString()}</td>
                       </tr>
                     ))
                   )}
@@ -187,9 +183,10 @@ const UserManagement = () => {
               </table>
             </div>
 
+            {/* Pagination */}
             {!loading && (
               <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/50">
-                <span>Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} users</span>
+                <span>Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} projects</span>
                 <div className="flex gap-1">
                   <button 
                     disabled={pagination.page <= 1}
@@ -216,4 +213,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default ProjectManagement;
