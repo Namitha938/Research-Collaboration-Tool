@@ -138,9 +138,50 @@ const logoutUser = async (req, res) => {
   });
 };
 
+// @desc    Update user profile or password
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (user) {
+      if (req.body.name) {
+        user.name = req.body.name;
+      }
+
+      if (req.body.newPassword && req.body.currentPassword) {
+        if (await user.matchPassword(req.body.currentPassword)) {
+          user.password = req.body.newPassword;
+        } else {
+          return res.status(401).json({ success: false, message: 'Invalid current password' });
+        }
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        success: true,
+        message: req.body.newPassword ? 'Password changed successfully' : 'Profile updated',
+        user: {
+          id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+        },
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
   logoutUser,
+  updateProfile,
 };

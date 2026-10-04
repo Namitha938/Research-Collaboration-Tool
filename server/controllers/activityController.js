@@ -1,15 +1,16 @@
 const Activity = require('../models/Activity');
 const Project = require('../models/Project');
+const mongoose = require('mongoose');
 
 // Helper to verify user is part of the project
 const verifyProjectAccess = async (projectId, userId) => {
   const project = await Project.findById(projectId);
   if (!project) return null;
   
-  if (project.owner.toString() === userId.toString()) return project;
+  if (project.owner && project.owner.toString() === userId.toString()) return project;
   
-  const isMember = project.members.some(
-    member => member.user.toString() === userId.toString()
+  const isMember = project.members && project.members.some(
+    member => member.user && member.user.toString() === userId.toString()
   );
   
   return isMember ? project : null;
@@ -21,6 +22,11 @@ const verifyProjectAccess = async (projectId, userId) => {
 const getProjectActivities = async (req, res) => {
   try {
     const { projectId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: 'Invalid project ID' });
+    }
+
     const page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 20;
     

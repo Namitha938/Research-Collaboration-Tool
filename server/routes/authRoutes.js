@@ -5,6 +5,7 @@ const {
   loginUser,
   getCurrentUser,
   logoutUser,
+  updateProfile,
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -19,6 +20,14 @@ router.post("/login", loginUser);
 // @route   GET /api/auth/me
 // @access  Private
 router.get("/me", authMiddleware, getCurrentUser);
+
+// @route   GET /api/auth/profile
+// @access  Private
+router.get("/profile", authMiddleware, getCurrentUser);
+
+// @route   PUT /api/auth/profile
+// @access  Private
+router.put("/profile", authMiddleware, updateProfile);
 
 // @route   POST /api/auth/logout
 // @access  Public
