@@ -1,5 +1,6 @@
 const Project = require("../models/Project");
 const { createActivity } = require("../utils/createActivity");
+const notifyAdmins = require("../utils/notifyAdmins");
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -32,6 +33,13 @@ const createProject = async (req, res) => {
       entityId: project._id,
       message: `created the project "${title}"`
     });
+
+    notifyAdmins({
+      type: "admin_new_project",
+      title: "New Research Project",
+      message: `${req.user.name} created the project "${title}".`,
+      project: project._id,
+    }).catch((err) => console.error(err));
 
     res.status(201).json({ success: true, project });
   } catch (error) {
@@ -117,6 +125,16 @@ const updateProject = async (req, res) => {
       entityId: project._id,
       message: `updated project details`
     });
+
+    // If status changed to completed
+    if (req.body.status === "completed" && project.status !== "completed") {
+      notifyAdmins({
+        type: "admin_project_completed",
+        title: "Project Completed",
+        message: `"${project.title}" has been marked as completed.`,
+        project: project._id,
+      }).catch((err) => console.error(err));
+    }
 
     res.json({ success: true, project: updatedProject });
   } catch (error) {

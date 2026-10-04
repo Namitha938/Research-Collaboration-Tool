@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
+const notifyAdmins = require("../utils/notifyAdmins");
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -38,6 +39,13 @@ const registerUser = async (req, res) => {
 
     if (user) {
       const token = generateToken(user._id, user.role);
+
+      // Notify admins asynchronously
+      notifyAdmins({
+        type: "admin_new_user",
+        title: "New Researcher Registered",
+        message: `${user.name} has registered on ResearchHub.`,
+      }).catch((err) => console.error(err));
 
       res.status(201).json({
         success: true,

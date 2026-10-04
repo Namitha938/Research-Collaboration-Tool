@@ -30,6 +30,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import ProjectManagement from "./pages/admin/ProjectManagement";
 
 export default function App() {
   return (
@@ -92,6 +93,15 @@ export default function App() {
               element={
                 <AdminProtectedRoute>
                   <UserManagement />
+                </AdminProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/projects"
+              element={
+                <AdminProtectedRoute>
+                  <ProjectManagement />
                 </AdminProtectedRoute>
               }
             />
