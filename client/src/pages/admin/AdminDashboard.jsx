@@ -75,17 +75,9 @@ const AdminDashboard = () => {
   const recentRegistrations = statsData ? statsData.recentUsers : [];
 
   const exportAuditLog = () => {
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "Timestamp,User,Action,IP_Address,Status\n"
-      + `${new Date().toISOString()},Admin,Exported Audit Log,192.168.1.1,Success\n`
-      + `${new Date().toISOString()},sarah.c@mit.edu,Created Project BioGen-9,10.0.0.4,Success\n`;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ResearchHub_Audit_Trail_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    toast("Audit log export is not available yet.", {
+      icon: '🚧',
+    });
   };
 
   return (

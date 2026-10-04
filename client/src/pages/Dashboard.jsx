@@ -6,20 +6,6 @@ import { useAuth } from "../context/AuthContext";
 import NewProjectModal from "../components/NewProjectModal";
 import ProjectCard from "../components/ProjectCard";
 
-// DEMO DATA: replace with API calls once the Task / Activity backends are implemented.
-const DEMO = { activeTasks: 8, completed: 12, progress: 65 };
-const ACTIVITY = [
-  { who: "You", text: "uploaded dataset.csv", when: "2 hours ago", letter: "H" },
-  { who: "Rahul S.", text: "completed Literature Review", when: "5 hours ago", letter: "R" },
-  { who: "Dr. Priya", text: "commented on Research Paper Draft", when: "Yesterday", letter: "P" },
-  { who: "New Member", text: "joined AI Research Project", when: "2 days ago", letter: "N" },
-];
-const UPCOMING = [
-  { title: "Submit literature review", due: "Tomorrow" },
-  { title: "Review dataset with team", due: "In 3 days" },
-  { title: "Draft methodology section", due: "Next week" },
-];
-
 const greeting = () => {
   const h = new Date().getHours();
   return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
@@ -41,11 +27,65 @@ export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/projects").then((r) => setProjects(r.data.projects)).catch(() => {});
+    api.get("/projects").then(async (r) => {
+      const projs = r.data.projects || [];
+      setProjects(projs);
+      
+      try {
+        // Fetch tasks and activities for all projects
+        const tasksPromises = projs.map(p => api.get(`/projects/${p._id}/tasks`).catch(() => ({ data: { tasks: [] } })));
+        const actPromises = projs.map(p => api.get(`/projects/${p._id}/activities?limit=5`).catch(() => ({ data: { activities: [] } })));
+        
+        const tasksRes = await Promise.all(tasksPromises);
+        const actRes = await Promise.all(actPromises);
+        
+        let allTasks = [];
+        tasksRes.forEach(res => {
+          if (res.data && res.data.tasks) {
+            allTasks = [...allTasks, ...res.data.tasks];
+          }
+        });
+        
+        let allActivities = [];
+        actRes.forEach(res => {
+          if (res.data && res.data.activities) {
+            allActivities = [...allActivities, ...res.data.activities];
+          }
+        });
+        
+        setTasks(allTasks);
+        
+        const sortedActivity = allActivities
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 5);
+          
+        setActivities(sortedActivity);
+      } catch (err) {
+        console.error("Error loading dashboard details", err);
+      } finally {
+        setLoading(false);
+      }
+    }).catch(() => {
+      setLoading(false);
+    });
   }, []);
+
+  const activeTasksCount = tasks.filter(t => t.status !== 'completed').length;
+  const completedTasksCount = tasks.filter(t => t.status === 'completed').length;
+  const avgProgress = projects.length > 0 
+    ? Math.round(projects.reduce((acc, p) => acc + (p.progress || 0), 0) / projects.length)
+    : 0;
+
+  const upcomingTasks = tasks
+    .filter(t => t.status !== 'completed' && t.dueDate)
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+    .slice(0, 3);
 
   return (
     <div className="mx-auto max-w-[1300px] animate-fade-in">
@@ -66,9 +106,9 @@ export default function Dashboard() {
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <Stat icon={FolderKanban} label="Projects" value={projects.length} tone="bg-blue-50 text-blue-600" />
-        <Stat icon={Clock} label="Active Tasks" value={DEMO.activeTasks} tone="bg-orange-50 text-orange-500" />
-        <Stat icon={ListChecks} label="Completed" value={DEMO.completed} tone="bg-emerald-50 text-emerald-600" />
-        <Stat icon={TrendingUp} label="Progress" value={`${DEMO.progress}%`} tone="bg-purple-50 text-purple-600" />
+        <Stat icon={Clock} label="Active Tasks" value={activeTasksCount} tone="bg-orange-50 text-orange-500" />
+        <Stat icon={ListChecks} label="Completed" value={completedTasksCount} tone="bg-emerald-50 text-emerald-600" />
+        <Stat icon={TrendingUp} label="Avg Progress" value={`${avgProgress}%`} tone="bg-purple-50 text-purple-600" />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
@@ -78,7 +118,9 @@ export default function Dashboard() {
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">My Research Projects</h2>
               <Link to="/projects" className="text-sm font-medium text-primary-600 hover:underline">View All</Link>
             </div>
-            {projects.length === 0 ? (
+            {loading ? (
+              <div className="py-10 text-center text-slate-400">Loading projects...</div>
+            ) : projects.length === 0 ? (
               <div className="flex flex-col items-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-14 text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400"><FolderKanban size={26} /></div>
                 <h3 className="mt-5 font-semibold text-slate-900 dark:text-white">No research projects yet</h3>
@@ -100,12 +142,18 @@ export default function Dashboard() {
               <Link to="/tasks" className="text-sm font-medium text-primary-600 hover:underline">View All</Link>
             </div>
             <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-              {UPCOMING.map((t) => (
-                <div key={t.title} className="flex items-center justify-between px-5 py-4 text-sm">
-                  <span className="font-medium text-slate-800 dark:text-slate-100">{t.title}</span>
-                  <span className="text-slate-500 dark:text-slate-400">{t.due}</span>
-                </div>
-              ))}
+              {loading ? (
+                <div className="p-6 text-center text-sm text-slate-500">Loading tasks...</div>
+              ) : upcomingTasks.length === 0 ? (
+                <div className="p-6 text-center text-sm text-slate-500">No upcoming tasks scheduled.</div>
+              ) : (
+                upcomingTasks.map((t) => (
+                  <div key={t._id} className="flex items-center justify-between px-5 py-4 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <span className="font-medium text-slate-800 dark:text-slate-100">{t.title}</span>
+                    <span className="text-slate-500 dark:text-slate-400">{new Date(t.dueDate).toLocaleDateString()}</span>
+                  </div>
+                ))
+              )}
             </div>
           </section>
         </div>
@@ -113,17 +161,31 @@ export default function Dashboard() {
         <aside className="h-fit rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Recent Activity</h2>
           <ul className="mt-5 divide-y divide-slate-100 dark:divide-slate-800">
-            {ACTIVITY.map((a) => (
-              <li key={a.text} className="flex gap-3 py-4 first:pt-0">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-600 dark:text-slate-400">{a.letter}</div>
-                <div>
-                  <p className="text-sm text-slate-700 dark:text-slate-300"><span className="font-semibold text-slate-900 dark:text-white">{a.who}</span> {a.text}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">{a.when}</p>
-                </div>
-              </li>
-            ))}
+            {loading ? (
+              <li className="py-4 text-center text-sm text-slate-500">Loading activity...</li>
+            ) : activities.length === 0 ? (
+              <li className="py-4 text-sm text-slate-500">No recent activity found.</li>
+            ) : (
+              activities.map((a) => {
+                const actorName = a.actor?.name || 'Someone';
+                const letter = actorName.charAt(0).toUpperCase();
+                const isYou = a.actor?._id === (user?.id || user?._id);
+                const displayName = isYou ? 'You' : actorName;
+                const date = new Date(a.createdAt).toLocaleDateString();
+                
+                return (
+                  <li key={a._id} className="flex gap-3 py-4 first:pt-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-600 dark:text-slate-400">{letter}</div>
+                    <div>
+                      <p className="text-sm text-slate-700 dark:text-slate-300"><span className="font-semibold text-slate-900 dark:text-white">{displayName}</span> {a.message}</p>
+                      <p className="mt-0.5 text-xs text-slate-400">{date}</p>
+                    </div>
+                  </li>
+                );
+              })
+            )}
           </ul>
-          <Link to="/notifications" className="mt-2 block text-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary-600">View All Activity</Link>
+          <Link to="/projects" className="mt-2 block text-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary-600">View All Projects</Link>
         </aside>
       </div>
 
@@ -132,4 +194,4 @@ export default function Dashboard() {
       )}
     </div>
   );
-}
+}
