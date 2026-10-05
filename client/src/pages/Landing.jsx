@@ -20,6 +20,7 @@ import FeatureCard from '../components/FeatureCard';
 import StepCard from '../components/StepCard';
 import StatsSection from '../components/StatsSection';
 import DashboardPreview from '../components/DashboardPreview';
+import RevealOnScroll from '../components/RevealOnScroll';
 
 const Landing = () => {
   const features = [
@@ -111,27 +112,34 @@ const Landing = () => {
 
       {/* Dashboard Preview Section (Visually part of Hero) */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto pb-20 relative z-10 -mt-4">
-        <DashboardPreview />
+        <RevealOnScroll delay={100}>
+          <DashboardPreview />
+        </RevealOnScroll>
       </section>
 
-      <StatsSection />
+      <RevealOnScroll delay={200}>
+        <StatsSection />
+      </RevealOnScroll>
 
       {/* Features Section */}
       <section id="features" className="py-24 bg-slate-50 dark:bg-slate-950 dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading 
-            title="Everything your research team needs" 
-            subtitle="A complete suite of tools designed specifically for the unique workflows of academic and professional research teams."
-          />
+          <RevealOnScroll>
+            <SectionHeading 
+              title="Everything your research team needs" 
+              subtitle="A complete suite of tools designed specifically for the unique workflows of academic and professional research teams."
+            />
+          </RevealOnScroll>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <FeatureCard 
-                key={index}
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-              />
+              <RevealOnScroll key={index} delay={index * 100}>
+                <FeatureCard 
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                />
+              </RevealOnScroll>
             ))}
           </div>
         </div>
@@ -143,44 +151,54 @@ const Landing = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             
             <div>
-              <SectionHeading 
-                title="Your entire research workflow, in one place." 
-                subtitle="Stop switching between ten different apps. ResearchHub brings your documents, data, tasks, and team communication into a single unified platform."
-                centered={false}
-              />
+              <RevealOnScroll>
+                <SectionHeading 
+                  title="Your entire research workflow, in one place." 
+                  subtitle="Stop switching between ten different apps. ResearchHub brings your documents, data, tasks, and team communication into a single unified platform."
+                  centered={false}
+                />
+              </RevealOnScroll>
               
               <div className="space-y-10 mt-12">
-                <StepCard 
-                  number="01" 
-                  title="Create a Project" 
-                  description="Start your research project, define its goals, structure, and required resources." 
-                />
-                <StepCard 
-                  number="02" 
-                  title="Build Your Team" 
-                  description="Invite collaborators, assign roles, and set up permissions for secure teamwork." 
-                />
-                <StepCard 
-                  number="03" 
-                  title="Collaborate & Research" 
-                  description="Share documents, upload datasets, assign tasks, and exchange ideas in real-time." 
-                />
-                <StepCard 
-                  number="04" 
-                  title="Track Progress" 
-                  description="Monitor milestones, manage deadlines, and move your research forward seamlessly." 
-                />
+                <RevealOnScroll delay={100}>
+                  <StepCard 
+                    number="01" 
+                    title="Create a Project" 
+                    description="Start your research project, define its goals, structure, and required resources." 
+                  />
+                </RevealOnScroll>
+                <RevealOnScroll delay={200}>
+                  <StepCard 
+                    number="02" 
+                    title="Build Your Team" 
+                    description="Invite collaborators, assign roles, and set up permissions for secure teamwork." 
+                  />
+                </RevealOnScroll>
+                <RevealOnScroll delay={300}>
+                  <StepCard 
+                    number="03" 
+                    title="Collaborate & Research" 
+                    description="Share documents, upload datasets, assign tasks, and exchange ideas in real-time." 
+                  />
+                </RevealOnScroll>
+                <RevealOnScroll delay={400}>
+                  <StepCard 
+                    number="04" 
+                    title="Track Progress" 
+                    description="Monitor milestones, manage deadlines, and move your research forward seamlessly." 
+                  />
+                </RevealOnScroll>
               </div>
             </div>
 
-            <div className="relative">
+            <RevealOnScroll delay={200} className="relative">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary-100 dark:from-indigo-900/30 to-blue-50 dark:to-purple-900/30 rounded-3xl transform rotate-3 scale-105 -z-10"></div>
               <img 
                 src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
                 alt="Research team collaborating" 
                 className="rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800/50 dark:border-slate-800 object-cover w-full aspect-[4/3]"
               />
-            </div>
+            </RevealOnScroll>
             
           </div>
         </div>
@@ -192,19 +210,21 @@ const Landing = () => {
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full max-h-[400px] bg-primary-600/20 blur-[120px] rounded-full"></div>
         </div>
         
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Ready to build better research together?
-          </h2>
-          <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
-            Bring your research team, resources, and ideas together in one powerful workspace.
-          </p>
-          <Link to="/register">
-            <Button variant="light" size="lg">
-              Start Your Research <ArrowRight size={18} className="ml-2" />
-            </Button>
-          </Link>
-        </div>
+        <RevealOnScroll>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+              Ready to build better research together?
+            </h2>
+            <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+              Bring your research team, resources, and ideas together in one powerful workspace.
+            </p>
+            <Link to="/register">
+              <Button variant="light" size="lg">
+                Start Your Research <ArrowRight size={18} className="ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </RevealOnScroll>
       </section>
 
       <Footer />
