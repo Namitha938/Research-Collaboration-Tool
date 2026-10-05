@@ -38,7 +38,9 @@ export default function ManageProject() {
           const p = response.project;
           
           // Check if owner
-          if (p.owner?._id !== user?.id && p.owner !== user?.id) {
+          const userId = user?.id || user?._id;
+          const ownerId = p.owner?._id || p.owner;
+          if (ownerId?.toString() !== userId?.toString()) {
             toast.error("You don't have permission to manage this project.");
             navigate(`/projects/${id}`);
             return;

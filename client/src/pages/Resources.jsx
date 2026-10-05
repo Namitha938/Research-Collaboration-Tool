@@ -16,7 +16,7 @@ import EditResourceModal from "../components/resources/EditResourceModal";
 import ResourceCard from "../components/resources/ResourceCard";
 import { useAuth } from "../context/AuthContext";
 
-export default function Resources({ defaultType }) {
+export default function Resources({ defaultType, projectId }) {
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -33,7 +33,7 @@ export default function Resources({ defaultType }) {
   const fetchResources = async () => {
     setLoading(true);
     try {
-      let url = "/resources";
+      let url = projectId ? `/projects/${projectId}/resources` : "/resources";
       const params = [];
       if (type && type !== "all") params.push(`type=${type}`);
       if (search) params.push(`search=${encodeURIComponent(search)}`);
@@ -79,16 +79,18 @@ export default function Resources({ defaultType }) {
     <>
     <div className="mx-auto max-w-7xl animate-fade-in space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Research Resources</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Central toolbox for datasets, repositories, links, and other materials across all your projects.
-          </p>
-        </div>
+        {!projectId && (
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Research Resources</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Central toolbox for datasets, repositories, links, and other materials across all your projects.
+            </p>
+          </div>
+        )}
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
+          className={`inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors ${projectId ? 'ml-auto' : ''}`}
         >
           <Database size={18} /> Add Resource
         </button>
@@ -154,6 +156,7 @@ export default function Resources({ defaultType }) {
 
     {showAddModal && (
       <AddResourceModal
+        defaultProjectId={projectId}
         onClose={() => setShowAddModal(false)}
         onAdded={() => fetchResources()}
       />

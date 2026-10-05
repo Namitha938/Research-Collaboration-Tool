@@ -7,10 +7,10 @@ import { useAuth } from "../context/AuthContext";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
-export default function Chat() {
+export default function Chat({ projectId, project }) {
   const { user } = useAuth();
   const [projects, setProjects] = useState([]);
-  const [activeProject, setActiveProject] = useState(null);
+  const [activeProject, setActiveProject] = useState(project || null);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [typingUser, setTypingUser] = useState(null);
@@ -44,17 +44,24 @@ export default function Chat() {
       setTypingUser(null);
     });
 
-    api
-      .get("/projects")
-      .then((res) => {
-        const projs = res.data.projects || [];
-        setProjects(projs);
-        if (projs.length > 0) {
-          setActiveProject(projs[0]);
-        }
-      })
-      .catch(() => toast.error("Could not load research channels"))
-      .finally(() => setLoading(false));
+    if (projectId) {
+      if (project) {
+        setActiveProject(project);
+        setLoading(false);
+      }
+    } else {
+      api
+        .get("/projects")
+        .then((res) => {
+          const projs = res.data.projects || [];
+          setProjects(projs);
+          if (projs.length > 0) {
+            setActiveProject(projs[0]);
+          }
+        })
+        .catch(() => toast.error("Could not load research channels"))
+        .finally(() => setLoading(false));
+    }
 
     return () => {
       socket.disconnect();
@@ -128,7 +135,7 @@ export default function Chat() {
     );
   }
 
-  if (projects.length === 0) {
+  if (!projectId && projects.length === 0) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center justify-center py-20 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 shadow-sm">
@@ -143,9 +150,10 @@ export default function Chat() {
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] animate-fade-in">
-      <div className="h-[calc(100vh-160px)] min-h-[550px] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col md:flex-row">
+    <div className={`mx-auto w-full animate-fade-in ${!projectId ? 'max-w-[1400px]' : ''}`}>
+      <div className={`${!projectId ? 'h-[calc(100vh-160px)] min-h-[550px]' : 'h-[600px]'} overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col md:flex-row`}>
         {/* Project Channels Sidebar */}
+        {!projectId && (
         <aside className="w-full border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/70 p-4 md:w-80 md:border-b-0 md:border-r flex flex-col">
           <div className="mb-3 flex items-center justify-between px-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-2">
@@ -194,6 +202,7 @@ export default function Chat() {
             })}
           </div>
         </aside>
+        )}
 
         {/* Chat Workspace */}
         <main className="flex flex-1 flex-col bg-white dark:bg-slate-900">

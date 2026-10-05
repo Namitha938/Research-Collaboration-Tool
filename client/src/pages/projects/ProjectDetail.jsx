@@ -10,6 +10,8 @@ import ResearchPapersTab from '../../components/research-papers/ResearchPapersTa
 import ReferencesTab from '../../components/references/ReferencesTab';
 import MilestonesTab from '../../components/milestones/MilestonesTab';
 import ActivityTab from '../../components/activity/ActivityTab';
+import Resources from '../Resources';
+import Chat from '../Chat';
 import { useAuth } from '../../context/AuthContext';
 
 const ProjectDetail = () => {
@@ -85,7 +87,11 @@ const ProjectDetail = () => {
             </span>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{project.title}</h1>
           </div>
-          {(project.owner?._id === user?.id || project.owner === user?.id) && (
+          {(() => {
+            const userId = user?.id || user?._id;
+            const ownerId = project.owner?._id || project.owner;
+            return ownerId?.toString() === userId?.toString();
+          })() && (
             <Link 
               to={`/projects/${project._id}/manage`}
               className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors shrink-0"
@@ -174,6 +180,10 @@ const ProjectDetail = () => {
         />
       ) : activeTab === 'Activity' ? (
         <ActivityTab projectId={project._id} />
+      ) : activeTab === 'Resources' ? (
+        <Resources projectId={project._id} />
+      ) : activeTab === 'Chat' ? (
+        <Chat projectId={project._id} project={project} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
