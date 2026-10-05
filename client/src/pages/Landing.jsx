@@ -57,7 +57,7 @@ const Landing = () => {
     {
       icon: <BookOpen size={24} />,
       title: "Citation Management",
-      description: "Organize references and citations for your research papers automatically."
+      description: "Organize references and citations for your research papers automatically With our Website."
     },
     {
       icon: <LineChart size={24} />,
