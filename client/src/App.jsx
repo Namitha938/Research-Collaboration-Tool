@@ -6,11 +6,22 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import { ThemeProvider } from "./context/ThemeContext";
 
 import Landing from "./pages/Landing";
+import About from "./pages/About";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Dashboard from "./pages/Dashboard";
+
+import ProjectsInfo from "./pages/product/ProjectsInfo";
+import CollaborationInfo from "./pages/product/CollaborationInfo";
+import ResourcesInfo from "./pages/product/ResourcesInfo";
+import Contact from "./pages/Contact";
+import Documentation from "./pages/Documentation";
+import HelpCenter from "./pages/HelpCenter";
+import ResearchGuide from "./pages/ResearchGuide";
 
 import Projects from "./pages/Projects";
 
@@ -45,11 +56,21 @@ export default function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/product/projects" element={<ProjectsInfo />} />
+            <Route path="/product/collaboration" element={<CollaborationInfo />} />
+            <Route path="/product/resources" element={<ResourcesInfo />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/documentation" element={<Documentation />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/research-guide" element={<ResearchGuide />} />
 
             {/* Invitation Route */}
             <Route

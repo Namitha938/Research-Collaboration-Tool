@@ -36,28 +36,27 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Product</h4>
             <ul className="flex flex-col gap-3">
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Projects</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Collaboration</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Resources</a></li>
+              <li><Link to="/#features" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</Link></li>
+              <li><Link to="/product/projects" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Projects</Link></li>
+              <li><Link to="/product/collaboration" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Collaboration</Link></li>
+              <li><Link to="/product/resources" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Resources</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Company</h4>
             <ul className="flex flex-col gap-3">
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">About</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Contact</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Careers</a></li>
+              <li><Link to="/about" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">About</Link></li>
+              <li><Link to="/contact" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Contact</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Resources</h4>
             <ul className="flex flex-col gap-3">
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Research Guide</a></li>
+              <li><Link to="/documentation" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Documentation</Link></li>
+              <li><Link to="/help" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Help Center</Link></li>
+              <li><Link to="/research-guide" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Research Guide</Link></li>
             </ul>
           </div>
           
@@ -68,8 +67,8 @@ const Footer = () => {
             © {new Date().getFullYear()} ResearchHub. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Privacy</a>
-            <a href="#" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Terms</a>
+            <Link to="/privacy" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Privacy</Link>
+            <Link to="/terms" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Terms</Link>
           </div>
         </div>
       </div>
