@@ -1,11 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import { Menu, Search, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
+import ProfileDropdown from '../ProfileDropdown';
 
 const Header = ({ setMobileMenuOpen }) => {
   const { user } = useAuth();
-  const photo = user?.profilePicture || user?.avatar;
 
   return (
     <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -31,23 +31,9 @@ const Header = ({ setMobileMenuOpen }) => {
           <Bell size={20} />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
         </Link>
-        <Link to="/settings" className="hidden sm:flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-6 group">
-          <div className="text-right">
-            <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-primary-600 transition-colors">{user?.name}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role}</p>
-          </div>
-          {photo ? (
-            <img 
-              src={photo} 
-              alt={user?.name || "User"} 
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800" 
-            />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-sm ring-2 ring-slate-100 dark:ring-slate-800">
-              {user?.name?.charAt(0) || 'U'}
-            </div>
-          )}
-        </Link>
+        <div className="border-l border-slate-200 dark:border-slate-800 pl-4 sm:pl-6">
+          <ProfileDropdown showName={true} align="right" />
+        </div>
       </div>
     </header>
   );

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Link, Outlet, useNavigate } from "react-router-dom";
 import {
   Atom, LayoutGrid, FolderKanban, SquareCheckBig, FileText, Database,
   BookOpen, Users, MessageSquare, Bell, Settings, LogOut, Search, Menu, Loader2, X
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import ProfileDropdown from "./ProfileDropdown";
 import api from "../api/axios";
 
 const NAV = [
@@ -127,18 +128,34 @@ export default function DashboardLayout() {
       </nav>
 
       <div className="border-t border-slate-100 dark:border-slate-800 p-4">
-        <div className="flex items-center gap-3 px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/50 font-semibold text-primary-600 dark:text-primary-400">
-            {initial(user?.name)}
+        <Link
+          to="/settings"
+          className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors group cursor-pointer"
+        >
+          {(user?.profilePicture || user?.avatar) ? (
+            <img
+              src={user?.profilePicture || user?.avatar}
+              alt={user?.name || "User"}
+              referrerPolicy="no-referrer"
+              className="h-10 w-10 rounded-full object-cover ring-2 ring-primary-500/20 shrink-0"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-primary-600 to-indigo-600 font-bold text-white text-sm shrink-0">
+              {initial(user?.name).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-slate-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+              {user?.name}
+            </p>
+            <p className="text-xs capitalize text-slate-500 dark:text-slate-400">
+              {user?.role || "Researcher"}
+            </p>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{user?.name}</p>
-            <p className="text-xs capitalize text-slate-500 dark:text-slate-400">{user?.role}</p>
-          </div>
-        </div>
+        </Link>
         <button
           onClick={handleLogout}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900"
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
         >
           <LogOut size={16} /> Logout
         </button>
@@ -273,14 +290,8 @@ export default function DashboardLayout() {
                 </span>
               )}
             </NavLink>
-            <div className="flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-5">
-              <div className="hidden text-right sm:block">
-                <p className="text-sm font-semibold leading-tight text-slate-900 dark:text-white">{user?.name}</p>
-                <p className="text-xs capitalize text-slate-500 dark:text-slate-400">{user?.role}</p>
-              </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/50 text-sm font-semibold text-primary-600 dark:text-primary-400">
-                {initial(user?.name)}
-              </div>
+            <div className="border-l border-slate-200 dark:border-slate-800 pl-3 sm:pl-5">
+              <ProfileDropdown showName={true} align="right" />
             </div>
           </div>
         </header>
