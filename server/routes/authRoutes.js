@@ -1,41 +1,62 @@
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 const {
   registerUser,
   loginUser,
+  googleLogin,
+  forgotPassword,
+  verifyResetToken,
+  resetPassword,
   getCurrentUser,
-  logoutUser,
   updateProfile,
+  changePassword,
+  uploadAvatar,
+  deleteAvatar,
+  getUserProfileById,
+  logoutUser,
   getCollaborators,
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
-// @route   POST /api/auth/register
-// @access  Public
+// Middleware to accept avatar/profilePicture/image/file uploaded via form-data
+const uploadProfilePicture = (req, res, next) => {
+  upload.any()(req, res, (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message });
+    if (req.files && req.files.length > 0) {
+      req.file = req.files[0];
+    }
+    next();
+  });
+};
+
+// Public Authentication Routes
 router.post("/register", registerUser);
-
-// @route   POST /api/auth/login
-// @access  Public
 router.post("/login", loginUser);
-
-// @route   GET /api/auth/me
-// @access  Private
-router.get("/me", authMiddleware, getCurrentUser);
-
-// @route   GET /api/auth/profile
-// @access  Private
-router.get("/profile", authMiddleware, getCurrentUser);
-
-// @route   PUT /api/auth/profile
-// @access  Private
-router.put("/profile", authMiddleware, updateProfile);
-
-// @route   POST /api/auth/logout
-// @access  Public
+router.post("/google", googleLogin);
 router.post("/logout", logoutUser);
 
-// @route   GET /api/auth/collaborators
-// @access  Private
+// Password Reset Routes
+router.post("/forgot-password", forgotPassword);
+router.get("/reset-password/:token", verifyResetToken);
+router.post("/reset-password", resetPassword);
+router.post("/reset-password/:token", resetPassword);
+router.put("/reset-password/:token", resetPassword);
+
+// Profile & Account Management Routes (Protected)
+router.get("/me", authMiddleware, getCurrentUser);
+router.get("/profile", authMiddleware, getCurrentUser);
+router.put("/profile", authMiddleware, updateProfile);
+router.put("/change-password", authMiddleware, changePassword);
+
+// Profile Picture Routes
+router.post("/profile/avatar", authMiddleware, uploadProfilePicture, uploadAvatar);
+router.post("/profile/picture", authMiddleware, uploadProfilePicture, uploadAvatar);
+router.delete("/profile/avatar", authMiddleware, deleteAvatar);
+router.delete("/profile/picture", authMiddleware, deleteAvatar);
+
+// Directory & Public Researcher Profile (Protected)
 router.get("/collaborators", authMiddleware, getCollaborators);
+router.get("/profile/:id", authMiddleware, getUserProfileById);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-require("dotenv").config();
+﻿require("dotenv").config();
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
@@ -51,6 +51,7 @@ app.get("/api/test-email", async (req, res) => {
 
 // Mount routes
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/invitations", require("./routes/invitationRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes"));
