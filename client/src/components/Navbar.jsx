@@ -46,10 +46,10 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Home</Link>
-            <a href="#features" className="text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</a>
-            <a href="#how-it-works" className="text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">How It Works</a>
-            <a href="#about" className="text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">About</a>
+            <Link to="/" className={`text-sm font-medium transition-colors ${location.pathname === '/' ? 'text-primary-600 dark:text-primary-400' : 'text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400'}`}>Home</Link>
+            <a href="/#features" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</a>
+            <a href="/#how-it-works" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">How It Works</a>
+            <Link to="/about" className={`text-sm font-medium transition-colors ${location.pathname === '/about' ? 'text-primary-600 dark:text-primary-400' : 'text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400'}`}>About</Link>
           </nav>
 
           {/* Desktop CTA */}
@@ -94,9 +94,10 @@ const Navbar = () => {
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-lg py-4 px-4 flex flex-col gap-4 animate-fade-in">
-          <Link to="/" className="text-base font-medium text-slate-700 dark:text-slate-300 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">Home</Link>
-          <a href="#features" className="text-base font-medium text-slate-700 dark:text-slate-300 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">Features</a>
-          <a href="#how-it-works" className="text-base font-medium text-slate-700 dark:text-slate-300 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">How It Works</a>
+          <Link to="/" className={`text-base font-medium py-2 border-b border-slate-100 dark:border-slate-800 ${location.pathname === '/' ? 'text-primary-600 dark:text-primary-400' : 'text-slate-700 dark:text-slate-300'}`}>Home</Link>
+          <a href="/#features" className="text-base font-medium text-slate-700 dark:text-slate-300 py-2 border-b border-slate-100 dark:border-slate-800">Features</a>
+          <a href="/#how-it-works" className="text-base font-medium text-slate-700 dark:text-slate-300 py-2 border-b border-slate-100 dark:border-slate-800">How It Works</a>
+          <Link to="/about" className={`text-base font-medium py-2 border-b border-slate-100 dark:border-slate-800 ${location.pathname === '/about' ? 'text-primary-600 dark:text-primary-400' : 'text-slate-700 dark:text-slate-300'}`}>About</Link>
           <div className="flex flex-col gap-3 mt-2">
             <Link to="/admin/login" className="flex items-center justify-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary-600 transition-colors py-1">
               Admin Portal <ArrowRight size={14} />
