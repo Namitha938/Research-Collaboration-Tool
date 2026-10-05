@@ -79,7 +79,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/admin/login" className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mr-2">
-                  Admin Portal <ArrowRight size={14} />
+                  Admin Portal
                 </Link>
                 <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 hover:text-slate-900 dark:text-white dark:hover:text-white transition-colors">
                   Sign In
@@ -165,7 +165,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/admin/login" className="flex items-center justify-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary-600 transition-colors py-1">
-                  Admin Portal <ArrowRight size={14} />
+                  Admin Portal
                 </Link>
                 <Link to="/login">
                   <Button variant="secondary" className="w-full">Sign In</Button>
