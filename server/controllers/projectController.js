@@ -13,6 +13,7 @@ const cloudinary = require("../config/cloudinary");
 
 const { createActivity } = require("../utils/createActivity");
 const notifyAdmins = require("../utils/notifyAdmins");
+const logAudit = require("../utils/logAudit");
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -52,6 +53,16 @@ const createProject = async (req, res) => {
       message: `${req.user.name} created the project "${title}".`,
       project: project._id,
     }).catch((err) => console.error(err));
+
+    logAudit({
+      req,
+      action: "project.created",
+      category: "project",
+      entityType: "project",
+      entityId: project._id,
+      description: `${req.user.name} created project "${title}" (${researchArea})`,
+      metadata: { researchArea, status: project.status },
+    }).catch(() => {});
 
     res.status(201).json({ success: true, project });
   } catch (error) {
@@ -197,6 +208,21 @@ const updateProject = async (req, res) => {
       }).catch((err) => console.error(err));
     }
 
+    logAudit({
+      req,
+      action:
+        status === "archived"
+          ? "project.archived"
+          : status
+          ? "project.status_changed"
+          : "project.updated",
+      category: "project",
+      entityType: "project",
+      entityId: project._id,
+      description: `${req.user.name} updated project "${project.title}"${status && status !== project.status ? ` (status: ${project.status} -> ${status})` : ""}`,
+      metadata: { from: project.status, to: status || project.status, fields: Object.keys(updateData) },
+    }).catch(() => {});
+
     res.json({ success: true, project: updatedProject });
   } catch (error) {
     console.error(error);
@@ -261,7 +287,17 @@ const deleteProject = async (req, res) => {
 
     // 5. Finally, delete the project itself
     await project.deleteOne();
-    
+
+    logAudit({
+      req,
+      action: "project.deleted",
+      category: "project",
+      entityType: "project",
+      entityId: projectId,
+      description: `${req.user.name} deleted project "${project.title}" and its ${documents.length} document(s), ${resources.length} resource(s) and ${papers.length} paper(s)`,
+      metadata: { title: project.title, researchArea: project.researchArea, status: project.status },
+    }).catch(() => {});
+
     res.json({ success: true, message: "Project deleted successfully" });
   } catch (error) {
     console.error("Error deleting project:", error);

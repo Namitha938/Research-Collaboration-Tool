@@ -5,6 +5,7 @@ const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 const createNotification = require("../utils/createNotification");
 const { createActivity } = require("../utils/createActivity");
+const logAudit = require("../utils/logAudit");
 
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
@@ -209,6 +210,16 @@ const removeProjectMember = async (req, res) => {
       message: `removed a member from the project`
     });
 
+    logAudit({
+      req,
+      action: "project.member_removed",
+      category: "project",
+      entityType: "user",
+      entityId: req.params.userId,
+      description: `${req.user.name} removed a member from "${project.title}"`,
+      metadata: { projectId: project._id, projectTitle: project.title },
+    }).catch(() => {});
+
     res.json({ success: true, message: "Member removed" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -240,6 +251,16 @@ const changeMemberRole = async (req, res) => {
 
     member.role = role;
     await project.save();
+
+    logAudit({
+      req,
+      action: "project.member_role_changed",
+      category: "project",
+      entityType: "user",
+      entityId: req.params.userId,
+      description: `${req.user.name} changed a member's role to ${role} in "${project.title}"`,
+      metadata: { projectId: project._id, projectTitle: project.title, role },
+    }).catch(() => {});
 
     await createNotification({
       recipient: req.params.userId,

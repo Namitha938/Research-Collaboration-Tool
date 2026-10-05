@@ -7,6 +7,7 @@ const Task = require("../models/Task");
 const ResearchPaper = require("../models/ResearchPaper");
 const generateToken = require("../utils/generateToken");
 const notifyAdmins = require("../utils/notifyAdmins");
+const logAudit = require("../utils/logAudit");
 const sendEmail = require("../utils/sendEmail");
 const cloudinary = require("../config/cloudinary");
 
@@ -67,6 +68,15 @@ const registerUser = async (req, res) => {
 
     const userExists = await User.findOne({ email: email.toLowerCase().trim() });
     if (userExists) {
+      logAudit({
+        action: "user.registration_failed",
+        category: "auth",
+        entityType: "user",
+        entityId: userExists._id,
+        description: `Registration blocked for ${email.toLowerCase().trim()} - email already registered`,
+        status: "failure",
+        req,
+      }).catch(() => {});
       return res.status(409).json({ success: false, message: "User already exists with this email" });
     }
 
@@ -85,6 +95,19 @@ const registerUser = async (req, res) => {
         title: "New Researcher Registered",
         message: `${user.name} has registered on ResearchHub.`,
       }).catch((err) => console.error(err));
+
+      logAudit({
+        actor: user._id,
+        actorName: user.name,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: "user.registered",
+        category: "auth",
+        entityType: "user",
+        entityId: user._id,
+        description: `${user.name} (${user.email}) registered a new account`,
+        req,
+      }).catch(() => {});
 
       res.status(201).json({
         success: true,
@@ -117,6 +140,19 @@ const loginUser = async (req, res) => {
     if (user && (await user.matchPassword(password))) {
       const token = generateToken(user._id, user.role);
 
+      logAudit({
+        actor: user._id,
+        actorName: user.name,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: "user.login",
+        category: "auth",
+        entityType: "user",
+        entityId: user._id,
+        description: `${user.name} signed in`,
+        req,
+      }).catch(() => {});
+
       res.json({
         success: true,
         message: "Login successful",
@@ -124,6 +160,16 @@ const loginUser = async (req, res) => {
         user: formatUserResponse(user),
       });
     } else {
+      logAudit({
+        action: "user.login_failed",
+        category: "security",
+        entityType: "user",
+        description: `Failed sign-in attempt for ${email.toLowerCase().trim()}`,
+        status: "failure",
+        metadata: { email: email.toLowerCase().trim() },
+        req,
+      }).catch(() => {});
+
       res.status(401).json({ success: false, message: "Invalid email or password" });
     }
   } catch (error) {
@@ -246,6 +292,19 @@ const googleLogin = async (req, res) => {
 
     const jwtToken = generateToken(user._id, user.role);
 
+    logAudit({
+      actor: user._id,
+      actorName: user.name,
+      actorEmail: user.email,
+      actorRole: user.role,
+      action: isNewUser ? "user.google_registered" : "user.google_login",
+      category: "auth",
+      entityType: "user",
+      entityId: user._id,
+      description: `${user.name} (${user.email}) signed in with Google${isNewUser ? " and was registered" : ""}`,
+      req,
+    }).catch(() => {});
+
     return res.status(isNewUser ? 201 : 200).json({
       success: true,
       message: isNewUser ? "Account created and signed in with Google" : "Signed in with Google successfully",
@@ -337,6 +396,19 @@ const forgotPassword = async (req, res) => {
         subject: "ResearchHub Password Reset Request",
         html: emailHtml,
       });
+
+      logAudit({
+        actor: user._id,
+        actorName: user.name,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: "user.password_reset_requested",
+        category: "security",
+        entityType: "user",
+        entityId: user._id,
+        description: `Password reset link sent to ${user.email}`,
+        req,
+      }).catch(() => {});
 
       return res.status(200).json({
         success: true,
@@ -454,6 +526,19 @@ const resetPassword = async (req, res) => {
     await user.save();
 
     const authToken = generateToken(user._id, user.role);
+
+    logAudit({
+      actor: user._id,
+      actorName: user.name,
+      actorEmail: user.email,
+      actorRole: user.role,
+      action: "user.password_reset_completed",
+      category: "security",
+      entityType: "user",
+      entityId: user._id,
+      description: `${user.name} completed a password reset`,
+      req,
+    }).catch(() => {});
 
     return res.status(200).json({
       success: true,
@@ -596,6 +681,23 @@ const updateProfile = async (req, res) => {
 
     const updatedUser = await user.save();
 
+    const changedFields = [];
+    ["name", "bio", "institution", "department", "designation", "phone", "location", "researchInterests", "skills", "socialLinks"].forEach((field) => {
+      if (req.body[field] !== undefined) changedFields.push(field);
+    });
+    if (req.body.profilePicture !== undefined || req.body.avatar !== undefined) changedFields.push("profilePicture");
+    if (newPassword) changedFields.push("password");
+
+    logAudit({
+      req,
+      action: "user.profile_updated",
+      category: "profile",
+      entityType: "user",
+      entityId: user._id,
+      description: `${updatedUser.name} updated profile fields: ${changedFields.length ? changedFields.join(", ") : "none"}`,
+      metadata: { fields: changedFields, passwordChanged: Boolean(newPassword) },
+    }).catch(() => {});
+
     res.json({
       success: true,
       message: newPassword ? "Profile and password updated successfully" : "Profile updated successfully",
@@ -645,6 +747,15 @@ const changePassword = async (req, res) => {
 
     user.password = newPassword;
     await user.save();
+
+    logAudit({
+      req,
+      action: "user.password_changed",
+      category: "security",
+      entityType: "user",
+      entityId: user._id,
+      description: `${user.name} changed their account password`,
+    }).catch(() => {});
 
     return res.status(200).json({
       success: true,
@@ -706,6 +817,15 @@ const uploadAvatar = async (req, res) => {
     user.profilePicture = cloudResult.secure_url;
     await user.save();
 
+    logAudit({
+      req,
+      action: "user.avatar_updated",
+      category: "profile",
+      entityType: "user",
+      entityId: user._id,
+      description: `${user.name} uploaded a new profile picture`,
+    }).catch(() => {});
+
     return res.status(200).json({
       success: true,
       message: "Profile picture uploaded successfully",
@@ -735,6 +855,15 @@ const deleteAvatar = async (req, res) => {
     user.avatar = "";
     user.profilePicture = "";
     await user.save();
+
+    logAudit({
+      req,
+      action: "user.avatar_removed",
+      category: "profile",
+      entityType: "user",
+      entityId: user._id,
+      description: `${user.name} removed their profile picture`,
+    }).catch(() => {});
 
     return res.status(200).json({
       success: true,
@@ -792,6 +921,17 @@ const getUserProfileById = async (req, res) => {
 // @route   POST /api/auth/logout
 // @access  Public
 const logoutUser = async (req, res) => {
+  if (req.user) {
+    logAudit({
+      req,
+      action: "user.logout",
+      category: "auth",
+      entityType: "user",
+      entityId: req.user._id,
+      description: `${req.user.name} signed out`,
+    }).catch(() => {});
+  }
+
   res.json({
     success: true,
     message: "Logged out successfully (client should remove token)",

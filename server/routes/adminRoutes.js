@@ -12,5 +12,7 @@ router.get("/users", adminController.getUsers);
 router.get("/users/:userId", adminController.getUserById);
 router.get("/projects", adminController.getProjects);
 router.get("/projects/:projectId", adminController.getProjectById);
+router.get("/audit-log", adminController.getAuditLogs);
+router.get("/audit-log/export", adminController.exportAuditLogs);
 
 module.exports = router;

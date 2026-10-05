@@ -17,6 +17,7 @@ const {
   getCollaborators,
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
+const optionalAuth = require("../middleware/optionalAuth");
 const upload = require("../middleware/upload");
 
 // Middleware to accept avatar/profilePicture/image/file uploaded via form-data
@@ -34,7 +35,7 @@ const uploadProfilePicture = (req, res, next) => {
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/google", googleLogin);
-router.post("/logout", logoutUser);
+router.post("/logout", optionalAuth, logoutUser);
 
 // Password Reset Routes
 router.post("/forgot-password", forgotPassword);

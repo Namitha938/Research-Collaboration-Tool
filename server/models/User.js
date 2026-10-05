@@ -28,6 +28,8 @@ const userSchema = new mongoose.Schema(
     },
     // Profile information
     avatar: { type: String, default: "" },
+    // Mirrors avatar so both field names stay in sync across the API.
+    profilePicture: { type: String, default: "" },
     bio: { type: String, maxlength: 500, default: "" },
     institution: { type: String, default: "" },
     department: { type: String, default: "" },
@@ -55,6 +57,16 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
+});
+
+// Keep avatar and profilePicture in sync no matter which one a caller sets.
+// All user writes in this codebase go through save(), so this covers them.
+userSchema.pre("save", function () {
+  if (this.isModified("avatar") && !this.isModified("profilePicture")) {
+    this.profilePicture = this.avatar;
+  } else if (this.isModified("profilePicture") && !this.isModified("avatar")) {
+    this.avatar = this.profilePicture;
+  }
 });
 
 userSchema.methods.matchPassword = function (entered) {
