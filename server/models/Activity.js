@@ -34,7 +34,8 @@ const activitySchema = new mongoose.Schema(
         'RESEARCH_PAPER_DELETED',
         'REFERENCE_ADDED',
         'MILESTONE_CREATED',
-        'MILESTONE_COMPLETED'
+        'MILESTONE_COMPLETED',
+        'DOCUMENT_COMMENTED'
       ]
     },
     entityType: {
