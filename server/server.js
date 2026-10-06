@@ -11,6 +11,7 @@ const { Server } = require("socket.io");
 
 const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/error");
+const { startReminderJob } = require("./utils/reminderJob");
 
 const app = express();
 const server = http.createServer(app);
@@ -72,5 +73,8 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || process.env.port || 5000;
 connectDB().then(() => {
-  server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+    startReminderJob();
+  });
 });

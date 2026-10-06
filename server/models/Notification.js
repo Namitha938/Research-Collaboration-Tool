@@ -26,6 +26,10 @@ const notificationSchema = new mongoose.Schema(
         "admin_new_project",
         "admin_project_completed",
         "document_commented",
+        "task_deadline_reminder",
+        "task_overdue",
+        "milestone_deadline_reminder",
+        "milestone_overdue",
       ],
       required: true,
     },
@@ -58,6 +62,9 @@ const notificationSchema = new mongoose.Schema(
     invitation: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Invitation",
+    },
+    dueDate: {
+      type: Date,
     },
     read: {
       type: Boolean,
