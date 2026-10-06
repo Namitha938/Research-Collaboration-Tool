@@ -9,10 +9,10 @@ const checkProjectMembership = async (projectId, userId) => {
   if (!project) return { project: null, role: null };
 
   const isOwner = project.owner.toString() === userId.toString();
-  const member = project.members.find((m) => m.user?.toString() === userId.toString());
+  const member = project.members.find((m) => (m.user?._id || m.user || m)?.toString() === userId.toString());
 
   if (isOwner) return { project, role: "owner" };
-  if (member) return { project, role: member.role };
+  if (member) return { project, role: member.role || "researcher" };
   return { project, role: null };
 };
 
@@ -105,11 +105,26 @@ const createResource = async (req, res) => {
     try {
       await resource.save();
     } catch (dbErr) {
-      console.error("Database save failed:", dbErr);
-      if (type === "file" && newResourceData.publicId) {
-        await cloudinary.uploader.destroy(newResourceData.publicId);
+      if (dbErr.code === 11000 && dbErr.message.includes('slug_1')) {
+        console.log("Found rogue slug_1 index causing E11000, dropping it...");
+        try {
+          await Resource.collection.dropIndex('slug_1');
+          console.log("Dropped rogue slug_1 index successfully. Retrying save...");
+          await resource.save();
+        } catch (dropErr) {
+          console.error("Failed to drop rogue index or save resource:", dropErr);
+          if (type === "file" && newResourceData.publicId) {
+            await cloudinary.uploader.destroy(newResourceData.publicId);
+          }
+          return res.status(500).json({ success: false, message: "Database save failed" });
+        }
+      } else {
+        console.error("Database save failed:", dbErr);
+        if (type === "file" && newResourceData.publicId) {
+          await cloudinary.uploader.destroy(newResourceData.publicId);
+        }
+        return res.status(500).json({ success: false, message: "Database save failed" });
       }
-      return res.status(500).json({ success: false, message: "Database save failed" });
     }
 
     const populatedResource = await Resource.findById(resource._id).populate("createdBy", "name email");
