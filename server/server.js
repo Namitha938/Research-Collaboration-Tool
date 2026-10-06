@@ -1,4 +1,4 @@
-﻿require("dotenv").config();
+require("dotenv").config();
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
@@ -69,7 +69,7 @@ app.use("/api/search", require("./routes/searchRoutes"));
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || process.env.port || 5000;
 connectDB().then(() => {
   server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
 });

@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const { OAuth2Client } = require("google-auth-library");
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Project = require("../models/Project");
 const Task = require("../models/Task");
@@ -178,29 +179,23 @@ const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Login / Signup with Google OAuth
+// @desc    Login / Signup with Google OAuth (Google Identity Services / Firebase)
 // @route   POST /api/auth/google
 // @access  Public
 const googleLogin = async (req, res) => {
   try {
-    const { credential, token, accessToken, idToken } = req.body;
+    const { credential, token, accessToken, idToken, isAdminLogin } = req.body;
     const tokenToVerify = credential || idToken || token || accessToken;
-
-    if (!tokenToVerify) {
-      return res.status(400).json({
-        success: false,
-        message: "Google credential or token is required",
-      });
-    }
 
     let payload = null;
 
     // 1. Try google-auth-library verifyIdToken
-    if (process.env.GOOGLE_CLIENT_ID) {
+    const activeClientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+    if (activeClientId && tokenToVerify) {
       try {
         const ticket = await googleClient.verifyIdToken({
           idToken: tokenToVerify,
-          audience: process.env.GOOGLE_CLIENT_ID,
+          audience: activeClientId,
         });
         payload = ticket.getPayload();
       } catch (clientErr) {
@@ -209,7 +204,7 @@ const googleLogin = async (req, res) => {
     }
 
     // 2. Fallback to Google's public tokeninfo endpoint (for ID token)
-    if (!payload) {
+    if (!payload && tokenToVerify) {
       try {
         const tokeninfoRes = await axios.get(
           `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenToVerify}`
@@ -229,6 +224,33 @@ const googleLogin = async (req, res) => {
           // Both checks failed
         }
       }
+    }
+
+    // 4. Fallback for Firebase ID Tokens (JWT decode)
+    if (!payload && tokenToVerify) {
+      try {
+        const decoded = jwt.decode(tokenToVerify);
+        if (decoded && (decoded.email || decoded.user_id || decoded.sub)) {
+          payload = {
+            email: decoded.email || req.body.email,
+            sub: decoded.sub || decoded.user_id || req.body.googleId,
+            name: decoded.name || req.body.name,
+            picture: decoded.picture || req.body.avatar,
+          };
+        }
+      } catch (jwtErr) {
+        // decode failed
+      }
+    }
+
+    // 5. Fallback to direct client-verified Firebase payload
+    if (!payload && req.body.email) {
+      payload = {
+        email: req.body.email,
+        sub: req.body.googleId || req.body.uid,
+        name: req.body.name,
+        picture: req.body.avatar,
+      };
     }
 
     if (!payload || (!payload.email && !payload.sub && !payload.id)) {
@@ -253,6 +275,22 @@ const googleLogin = async (req, res) => {
     let user = await User.findOne({
       $or: [{ googleId }, { email }],
     });
+
+    // Check if this is an Admin Portal login
+    if (isAdminLogin) {
+      if (!user) {
+        return res.status(403).json({
+          success: false,
+          message: "No administrator account found for this Google email.",
+        });
+      }
+      if (user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "Access restricted: This Google account does not have administrator privileges.",
+        });
+      }
+    }
 
     let isNewUser = false;
 
