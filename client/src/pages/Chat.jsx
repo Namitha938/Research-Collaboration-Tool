@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-import { Send, Users, MessageSquare, FolderKanban, Sparkles } from "lucide-react";
+import { Send, Users, MessageSquare, FolderKanban, Sparkles, MoreVertical, Edit2, Trash2, X, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -15,6 +15,11 @@ export default function Chat({ projectId, project }) {
   const [inputMessage, setInputMessage] = useState("");
   const [typingUser, setTypingUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Edit/Delete state
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [menuOpenId, setMenuOpenId] = useState(null);
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -34,6 +39,23 @@ export default function Chat({ projectId, project }) {
 
     socket.on("receive_message", (message) => {
       setMessages((prev) => [...prev, message]);
+    });
+
+    socket.on("message_edited", (updatedMessage) => {
+      setMessages((prev) =>
+        prev.map((m) => (m._id === updatedMessage._id ? updatedMessage : m))
+      );
+    });
+
+    socket.on("message_deleted", ({ messageId }) => {
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m._id === messageId) {
+            return { ...m, deleted: true, content: "Message deleted" };
+          }
+          return m;
+        })
+      );
     });
 
     socket.on("user_typing", ({ userName }) => {
@@ -124,6 +146,35 @@ export default function Chat({ projectId, project }) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage(e);
+    }
+  };
+
+  const handleEditClick = (message) => {
+    setEditingMessageId(message._id);
+    setEditContent(message.content);
+    setMenuOpenId(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingMessageId(null);
+    setEditContent("");
+  };
+
+  const saveEdit = () => {
+    if (!editContent.trim() || !socketRef.current) return;
+    
+    socketRef.current.emit("edit_message", {
+      messageId: editingMessageId,
+      content: editContent.trim(),
+    });
+    setEditingMessageId(null);
+    setEditContent("");
+  };
+
+  const handleDeleteClick = (messageId) => {
+    setMenuOpenId(null);
+    if (window.confirm("Delete this message?")) {
+      socketRef.current?.emit("delete_message", { messageId });
     }
   };
 
@@ -232,10 +283,12 @@ export default function Chat({ projectId, project }) {
               messages.map((m, idx) => {
                 const isSelf =
                   (m.sender?._id || m.sender) === (user?._id || user?.id);
+                const isEditing = editingMessageId === m._id;
+                
                 return (
                   <div
                     key={m._id || idx}
-                    className={`flex flex-col ${isSelf ? "items-end" : "items-start"}`}
+                    className={`flex flex-col group ${isSelf ? "items-end" : "items-start"}`}
                   >
                     <div className="mb-1 flex items-center gap-2 text-xs text-slate-400 px-1">
                       <span className="font-semibold text-slate-700 dark:text-slate-300">
@@ -247,16 +300,81 @@ export default function Chat({ projectId, project }) {
                           minute: "2-digit",
                         })}
                       </span>
+                      {m.edited && !m.deleted && (
+                        <span className="text-[10px] text-slate-400 italic">(edited)</span>
+                      )}
                     </div>
 
-                    <div
-                      className={`max-w-md rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-2xs ${
-                        isSelf
-                          ? "bg-indigo-600 text-white rounded-tr-xs"
-                          : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-xs"
-                      }`}
-                    >
-                      <div className="whitespace-pre-wrap">{m.content}</div>
+                    <div className="relative flex items-start gap-2 max-w-full sm:max-w-[75%] md:max-w-md">
+                      {isSelf && !m.deleted && !isEditing && (
+                        <div className="relative opacity-0 group-hover:opacity-100 transition-opacity flex items-center self-center mr-1">
+                          <button
+                            onClick={() => setMenuOpenId(menuOpenId === m._id ? null : m._id)}
+                            className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+                          
+                          {menuOpenId === m._id && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)}></div>
+                              <div className="absolute right-6 top-0 z-20 w-32 rounded-lg bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700 py-1 flex flex-col overflow-hidden">
+                                <button
+                                  onClick={() => handleEditClick(m)}
+                                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-left transition-colors"
+                                >
+                                  <Edit2 size={12} /> Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteClick(m._id)}
+                                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left transition-colors"
+                                >
+                                  <Trash2 size={12} /> Delete
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {isEditing ? (
+                        <div className="flex flex-col w-full max-w-md bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-900/50 rounded-2xl p-3 shadow-sm min-w-[250px]">
+                          <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            className="w-full resize-none text-sm text-slate-800 dark:text-slate-100 bg-transparent outline-none"
+                            rows={3}
+                            autoFocus
+                          />
+                          <div className="flex justify-end gap-2 mt-2">
+                            <button
+                              onClick={cancelEdit}
+                              className="px-3 py-1 rounded-lg text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1"
+                            >
+                              <X size={12} /> Cancel
+                            </button>
+                            <button
+                              onClick={saveEdit}
+                              disabled={!editContent.trim()}
+                              className="px-3 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center gap-1"
+                            >
+                              <Check size={12} /> Save
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-2xs ${
+                            m.deleted
+                              ? "bg-slate-100 dark:bg-slate-800 text-slate-400 italic"
+                              : isSelf
+                              ? "bg-indigo-600 text-white rounded-tr-xs"
+                              : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-xs"
+                          }`}
+                        >
+                          <div className="whitespace-pre-wrap">{m.content}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

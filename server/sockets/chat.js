@@ -102,6 +102,56 @@ module.exports = (io) => {
       }
     });
 
+    socket.on("edit_message", async (data) => {
+      try {
+        const { messageId, content } = data;
+        if (!content || !content.trim()) return;
+        
+        const message = await Message.findById(messageId).populate("project");
+        if (!message || message.deleted) return;
+        if (message.sender.toString() !== socket.user._id.toString()) return;
+
+        const project = message.project;
+        const isMember = project.owner.toString() === socket.user._id.toString() || 
+                         project.members.some(m => (m.user?._id || m.user || m).toString() === socket.user._id.toString());
+        if (!isMember) return;
+        
+        message.content = content.trim();
+        message.edited = true;
+        message.editedAt = new Date();
+        await message.save();
+        
+        const populatedMessage = await Message.findById(messageId).populate("sender", "name email");
+        io.to(`project:${project._id}`).emit("message_edited", populatedMessage);
+      } catch (error) {
+        console.error("Message edit error:", error);
+      }
+    });
+
+    socket.on("delete_message", async (data) => {
+      try {
+        const { messageId } = data;
+        const message = await Message.findById(messageId).populate("project");
+        if (!message || message.deleted) return;
+        if (message.sender.toString() !== socket.user._id.toString()) return;
+
+        const project = message.project;
+        const isMember = project.owner.toString() === socket.user._id.toString() || 
+                         project.members.some(m => (m.user?._id || m.user || m).toString() === socket.user._id.toString());
+        if (!isMember) return;
+        
+        message.deleted = true;
+        message.deletedAt = new Date();
+        message.content = "Message deleted";
+        await message.save();
+        
+        io.to(`project:${project._id}`).emit("message_deleted", { messageId });
+      } catch (error) {
+        console.error("Message delete error:", error);
+      }
+    });
+
+
     socket.on("disconnect", () => {
       console.log("[SOCKET] disconnected:", socket.id);
     });

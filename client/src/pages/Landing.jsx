@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
   FolderKanban, 
   Users, 
@@ -31,6 +32,23 @@ const Landing = () => {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.12, delayChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 25 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -109,46 +127,65 @@ const Landing = () => {
       <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative overflow-hidden">
         
         {/* Abstract shapes */}
-        <div className="absolute top-0 right-0 -z-10 translate-x-1/3 -translate-y-1/4">
-          <div className="w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary-100 dark:from-indigo-600/30 to-blue-50 dark:to-purple-600/20 blur-[100px] opacity-70"></div>
+        <div className="absolute top-0 right-0 -z-10 translate-x-1/3 -translate-y-1/4 pointer-events-none">
+          <motion.div 
+            animate={{ y: [0, -15, 0], x: [0, 10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary-100 dark:from-indigo-600/30 to-blue-50 dark:to-purple-600/20 blur-[100px] opacity-70"
+          />
         </div>
-        <div className="absolute bottom-0 left-0 -z-10 -translate-x-1/3 translate-y-1/4">
-          <div className="w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-purple-100 dark:from-purple-600/25 to-primary-50 dark:to-pink-500/20 blur-[100px] opacity-60"></div>
+        <div className="absolute bottom-0 left-0 -z-10 -translate-x-1/3 translate-y-1/4 pointer-events-none">
+          <motion.div 
+            animate={{ y: [0, 15, 0], x: [0, -10, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-purple-100 dark:from-purple-600/25 to-primary-50 dark:to-pink-500/20 blur-[100px] opacity-60"
+          />
         </div>
 
-        <div className="text-center max-w-4xl mx-auto relative z-10 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 mb-8 shadow-sm">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="text-center max-w-4xl mx-auto relative z-10"
+        >
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-300 mb-8 shadow-sm">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
             </span>
             Built for modern research teams
-          </div>
+          </motion.div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.1]">
+          <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.1]">
             Collaborate. Research. <br className="hidden md:block"/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 dark:from-indigo-400 to-blue-600 dark:to-pink-400">Discover.</span>
-          </h1>
+          </motion.h1>
           
-          <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             One workspace for researchers and students to collaborate, manage research projects, organize resources, and turn ideas into meaningful discoveries.
-          </p>
+          </motion.p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {user ? (
-              <Link to="/dashboard" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:border-0">
-                  Enter Workspace <ArrowRight size={18} className="ml-2" />
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link to="/register" className="w-full sm:w-auto">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                <Link to="/dashboard" className="block w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:border-0">
-                    Start Researching
+                    Enter Workspace <ArrowRight size={18} className="ml-2" />
                   </Button>
                 </Link>
-                <button
+              </motion.div>
+            ) : (
+              <>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                  <Link to="/register" className="block w-full sm:w-auto">
+                    <Button size="lg" className="w-full sm:w-auto dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:border-0">
+                      Start Researching
+                    </Button>
+                  </Link>
+                </motion.div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
@@ -161,23 +198,29 @@ const Landing = () => {
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
                   Continue with Google
-                </button>
+                </motion.button>
               </>
             )}
             {!user && (
-              <a href="#features" className="w-full sm:w-auto">
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700">Explore Features</Button>
-              </a>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                <a href="#features" className="block w-full sm:w-auto">
+                  <Button variant="secondary" size="lg" className="w-full sm:w-auto dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700">Explore Features</Button>
+                </a>
+              </motion.div>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Dashboard Preview Section (Visually part of Hero) */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto pb-20 relative z-10 -mt-4">
-        <RevealOnScroll delay={100}>
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
           <DashboardPreview />
-        </RevealOnScroll>
+        </motion.div>
       </section>
 
       <RevealOnScroll delay={200}>
