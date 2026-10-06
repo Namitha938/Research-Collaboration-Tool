@@ -65,6 +65,7 @@ app.use("/api", require("./routes/milestoneRoutes"));
 app.use("/api", require("./routes/referenceRoutes"));
 app.use("/api", require("./routes/commentRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/projects", require("./routes/contributionRoutes"));
 app.use("/api/projects/:projectId/activities", require("./routes/activityRoutes"));
 app.use("/api/search", require("./routes/searchRoutes"));
 
