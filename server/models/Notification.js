@@ -25,6 +25,7 @@ const notificationSchema = new mongoose.Schema(
         "admin_new_user",
         "admin_new_project",
         "admin_project_completed",
+        "document_commented",
       ],
       required: true,
     },
@@ -49,6 +50,10 @@ const notificationSchema = new mongoose.Schema(
     milestone: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Milestone",
+    },
+    document: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Document",
     },
     invitation: {
       type: mongoose.Schema.Types.ObjectId,

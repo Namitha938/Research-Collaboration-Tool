@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Plus, FileText, Download, Trash2, Eye } from "lucide-react";
+import { Plus, FileText, Download, Trash2, Eye, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import UploadDocumentModal from "../UploadDocumentModal";
+import DocumentComments from "../DocumentComments";
 import { useAuth } from "../../context/AuthContext";
 
 export default function DocumentsTab({ projectId, project }) {
@@ -10,6 +11,7 @@ export default function DocumentsTab({ projectId, project }) {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [activeDocumentForComments, setActiveDocumentForComments] = useState(null);
 
   const isOwner = project?.owner?._id === user?._id || project?.owner === user?._id;
   
@@ -157,6 +159,13 @@ export default function DocumentsTab({ projectId, project }) {
                       >
                         <Download size={16} />
                       </button>
+                      <button
+                        onClick={() => setActiveDocumentForComments(d)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition"
+                        title="Comments"
+                      >
+                        <MessageSquare size={16} />
+                      </button>
                       {isOwner && (
                         <button
                           onClick={() => handleDelete(d._id, d.name)}
@@ -180,6 +189,14 @@ export default function DocumentsTab({ projectId, project }) {
           defaultProjectId={projectId}
           onClose={() => setShowUploadModal(false)}
           onUploaded={(newDoc) => setDocuments((prev) => [newDoc, ...prev])}
+        />
+      )}
+
+      {activeDocumentForComments && (
+        <DocumentComments
+          document={activeDocumentForComments}
+          projectId={projectId}
+          onClose={() => setActiveDocumentForComments(null)}
         />
       )}
     </div>
