@@ -9,6 +9,7 @@ const Activity = require("../models/Activity");
 const Message = require("../models/Message");
 const Notification = require("../models/Notification");
 const Invitation = require("../models/Invitation");
+const Comment = require("../models/Comment");
 const cloudinary = require("../config/cloudinary");
 
 const { createActivity } = require("../utils/createActivity");
@@ -283,6 +284,7 @@ const deleteProject = async (req, res) => {
       Message.deleteMany({ project: projectId }),
       Notification.deleteMany({ project: projectId }),
       Invitation.deleteMany({ project: projectId }),
+      Comment.deleteMany({ project: projectId }),
     ]);
 
     // 5. Finally, delete the project itself

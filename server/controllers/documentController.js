@@ -151,7 +151,7 @@ const getAllDocuments = async (req, res) => {
     }
 
     const documents = await Document.find(query)
-      .populate("project", "title")
+      .populate("project", "title owner members")
       .populate("uploadedBy", "name email")
       .sort({ createdAt: -1 });
 

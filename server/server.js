@@ -11,6 +11,7 @@ const { Server } = require("socket.io");
 
 const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/error");
+const { startReminderJob } = require("./utils/reminderJob");
 
 const app = express();
 const server = http.createServer(app);
@@ -62,6 +63,7 @@ app.use("/api", require("./routes/resourceRoutes"));
 app.use("/api", require("./routes/researchPaperRoutes"));
 app.use("/api", require("./routes/milestoneRoutes"));
 app.use("/api", require("./routes/referenceRoutes"));
+app.use("/api", require("./routes/commentRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/projects/:projectId/activities", require("./routes/activityRoutes"));
 app.use("/api/search", require("./routes/searchRoutes"));
@@ -71,5 +73,8 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || process.env.port || 5000;
 connectDB().then(() => {
-  server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+    startReminderJob();
+  });
 });

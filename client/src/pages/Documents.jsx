@@ -11,10 +11,12 @@ import {
   FileCode,
   FileArchive,
   Eye,
+  MessageSquare,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import UploadDocumentModal from "../components/UploadDocumentModal";
+import DocumentComments from "../components/DocumentComments";
 
 export default function Documents({ defaultCategory }) {
   const [documents, setDocuments] = useState([]);
@@ -22,6 +24,7 @@ export default function Documents({ defaultCategory }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(defaultCategory || "all");
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [activeDocumentForComments, setActiveDocumentForComments] = useState(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -215,6 +218,13 @@ export default function Documents({ defaultCategory }) {
                           <Download size={16} />
                         </button>
                         <button
+                          onClick={() => setActiveDocumentForComments(doc)}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition"
+                          title="Comments"
+                        >
+                          <MessageSquare size={16} />
+                        </button>
+                        <button
                           onClick={() => handleDelete(doc._id, doc.name)}
                           className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
                           title="Delete document"
@@ -236,6 +246,14 @@ export default function Documents({ defaultCategory }) {
       <UploadDocumentModal
         onClose={() => setShowUploadModal(false)}
         onUploaded={() => fetchDocuments()}
+      />
+    )}
+
+    {activeDocumentForComments && (
+      <DocumentComments
+        document={activeDocumentForComments}
+        projectId={activeDocumentForComments.project._id}
+        onClose={() => setActiveDocumentForComments(null)}
       />
     )}
     </>
