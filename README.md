@@ -76,7 +76,6 @@ Research-Collaboration-Tool/
 │   ├── sockets/                # Socket.IO chat logic
 │   ├── utils/                  # Helpers (notifications, reminder jobs, ...)
 │   └── server.js               # Entry point
-├── scratch/                    # Experimental / test code
 └── README.md
 ```
 
